@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "745104333832",
+    "project_id": "kardiol0g",
+    "storage_bucket": "kardiol0g.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745104333832:android:fed12860c3db7421e2c5bd",
+        "android_client_info": {
+          "package_name": "com.party.kardiol0g"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaYPFGIzwXtilYHvxn9tMI-FAj2Fyxlio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
