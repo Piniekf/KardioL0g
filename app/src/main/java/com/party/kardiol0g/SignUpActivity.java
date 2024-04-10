@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.party.kardiol0g.R;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -51,8 +53,17 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                String userId = auth.getCurrentUser().getUid();
+                                DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
+                                // Więcej danych jak będzie potrzebnych, póki co zostawiam tak
+                                currentUserDb.child("email").setValue(user);
+                                currentUserDb.child("imie").setValue("");
+                                currentUserDb.child("nazwisko").setValue("");
+                                currentUserDb.child("dataUrodzenia").setValue("");
+                                currentUserDb.child("czyLekarz").setValue(false); // Domyślnie ustawione na false, może być zmienione w InitialSettingsActivity
+
                                 Toast.makeText(SignUpActivity.this, "Rejestracja pomyślna!", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                                startActivity(new Intent(SignUpActivity.this, InitialSettingsActivity.class));
                             } else {
                                 Toast.makeText(SignUpActivity.this, "Rejestracja nie powiodła się" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
