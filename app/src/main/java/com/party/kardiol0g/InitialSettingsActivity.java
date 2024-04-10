@@ -1,18 +1,24 @@
 package com.party.kardiol0g;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Calendar;
 
 public class InitialSettingsActivity extends AppCompatActivity {
 
@@ -34,12 +40,39 @@ public class InitialSettingsActivity extends AppCompatActivity {
         radioGroupRole = findViewById(R.id.radioGroupRole);
         buttonSave = findViewById(R.id.buttonSave);
 
+        editTextDateOfBirth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
+
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 saveSettings();
             }
         });
+    }
+
+    private void showDatePickerDialog() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        editTextDateOfBirth.setText(selectedDate);
+                    }
+                },
+                year, month, dayOfMonth);
+
+        datePickerDialog.show();
     }
 
     private void saveSettings() {
