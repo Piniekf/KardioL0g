@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,6 +19,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -32,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 Toast.makeText(this, "Tu będą ustawienia", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.share:
-                Toast.makeText(this, "Tu będzie udostępnianie", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, QRCodeActivity.class));
                 return true;
             case R.id.logout:
                         gClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
