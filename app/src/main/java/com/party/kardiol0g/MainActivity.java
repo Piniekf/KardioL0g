@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.medicines:
                     replaceFragment(new MedicineFragment());
                     break;
+                case R.id.files:
+                    replaceFragment(new FilesFragment());
+                    break;
                 case R.id.bloodpreasure:
                     replaceFragment(new PreasureFragment());
                     break;
