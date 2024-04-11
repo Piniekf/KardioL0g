@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "745104333832",
+    "firebase_url": "https://kardiol0g-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "kardiol0g",
+    "storage_bucket": "kardiol0g.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745104333832:android:fed12860c3db7421e2c5bd",
+        "android_client_info": {
+          "package_name": "com.party.kardiol0g"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "745104333832-k77ted70ndubbs4c9708nc5t45v6426u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.party.kardiol0g",
+            "certificate_hash": "bf594f489a63f52814752ad09cdea27de50b35fd"
+          }
+        },
+        {
+          "client_id": "745104333832-11381hjq64e1a372vicurkauk43qmdea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaYPFGIzwXtilYHvxn9tMI-FAj2Fyxlio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745104333832-11381hjq64e1a372vicurkauk43qmdea.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
