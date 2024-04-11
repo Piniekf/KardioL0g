@@ -10,7 +10,7 @@
     tools:openDrawer="start"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -31,7 +31,52 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    </LinearLayout>
+        <!-- Kontener dla dolnego paska narzędzi -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Dolny pasek narzędzi -->
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/bottomAppBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                app:fabCradleMargin="0dp"
+                app:fabCradleRoundedCornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="BottomAppBar">
+
+                <!-- Dolne menu nawigacyjne -->
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottomNavigationView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:background="@android:color/transparent"
+                    app:labelVisibilityMode="labeled"
+                    app:menu="@menu/bottom_menu" />
+
+            </com.google.android.material.bottomappbar.BottomAppBar>
+
+            <!-- Przycisk FAB -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="70dp"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/baseline_add_24"
+                app:tint="@color/appred"
+                app:layout_constraintBottom_toBottomOf="@id/bottomAppBar"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </RelativeLayout>
 
     <!-- Nawigacja boczna -->
     <com.google.android.material.navigation.NavigationView
@@ -44,49 +89,5 @@
         app:itemIconTint="@color/appred"
         app:itemTextColor="@color/appred"/>
 
-    <!-- Kontener dla dolnego paska narzędzi -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!-- Dolny pasek narzędzi -->
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:fabCradleMargin="0dp"
-            app:fabCradleRoundedCornerRadius="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="BottomAppBar">
-
-            <!-- Dolne menu nawigacyjne -->
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottomNavigationView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:background="@android:color/transparent"
-                app:labelVisibilityMode="labeled"
-                app:menu="@menu/bottom_menu" />
-
-        </com.google.android.material.bottomappbar.BottomAppBar>
-
-        <!-- Przycisk FAB -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="70dp"
-            android:layout_marginRight="5dp"
-            android:backgroundTint="@color/white"
-            android:src="@drawable/baseline_add_24"
-            app:tint="@color/appred"
-            app:layout_constraintBottom_toBottomOf="@id/bottomAppBar"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
