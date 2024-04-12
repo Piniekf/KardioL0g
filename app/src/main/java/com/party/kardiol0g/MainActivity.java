@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showBottomDialog();
             }
         });
-    } //outside onCreate
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Ustawienia!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_share:
+                startActivity(new Intent (MainActivity.this, QRCodeActivity.class));
                 Toast.makeText(this, "QR Kod!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_about:
@@ -107,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_logout:
                 mAuth.signOut();
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+                startActivity(new Intent (MainActivity.this, LoginActivity.class));
                 finish();
                 Toast.makeText(this, "Wylogowano!", Toast.LENGTH_SHORT).show();
                 break;
