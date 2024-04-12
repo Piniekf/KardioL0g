@@ -72,12 +72,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         String name = dataSnapshot.child("imie").getValue(String.class);
+                        String surname = dataSnapshot.child("nazwisko").getValue(String.class);
                         String email = dataSnapshot.child("email").getValue(String.class);
 
                         View headerView = navigationView.getHeaderView(0);
                         TextView nameTextView = headerView.findViewById(R.id.name);
                         TextView emailTextView = headerView.findViewById(R.id.email);
-                        nameTextView.setText(name);
+                        nameTextView.setText(name + " " + surname);
                         emailTextView.setText(email);
                     }
                 }

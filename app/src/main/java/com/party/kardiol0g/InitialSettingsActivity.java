@@ -3,6 +3,7 @@ package com.party.kardiol0g;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -11,7 +12,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,8 +22,8 @@ import java.util.Calendar;
 
 public class InitialSettingsActivity extends AppCompatActivity {
 
-    private EditText editTextFirstName, editTextLastName, editTextDateOfBirth;
-    private RadioGroup radioGroupRole;
+    private EditText editTextFirstName, editTextLastName, editTextDateOfBirth, editTextHeight, editTextWeight;
+    private RadioGroup radioGroupRole, radioGroupGender;
     private Button buttonSave;
     private DatabaseReference userDatabase;
 
@@ -37,7 +37,10 @@ public class InitialSettingsActivity extends AppCompatActivity {
         editTextFirstName = findViewById(R.id.editTextFirstName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextDateOfBirth = findViewById(R.id.editTextDateOfBirth);
+        editTextHeight = findViewById(R.id.editTextHeight);
+        editTextWeight = findViewById(R.id.editTextWeight);
         radioGroupRole = findViewById(R.id.radioGroupRole);
+        radioGroupGender = findViewById(R.id.radioGroupGender);
         buttonSave = findViewById(R.id.buttonSave);
 
         editTextDateOfBirth.setOnClickListener(new View.OnClickListener() {
@@ -79,15 +82,36 @@ public class InitialSettingsActivity extends AppCompatActivity {
         String firstName = editTextFirstName.getText().toString().trim();
         String lastName = editTextLastName.getText().toString().trim();
         String dateOfBirth = editTextDateOfBirth.getText().toString().trim();
+        String heightStr = editTextHeight.getText().toString().trim();
+        String weightStr = editTextWeight.getText().toString().trim();
+
+        // Walidacja pól
+        if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(dateOfBirth) ||
+                TextUtils.isEmpty(heightStr) || TextUtils.isEmpty(weightStr) ||
+                radioGroupRole.getCheckedRadioButtonId() == -1 || radioGroupGender.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Konwersja wzrostu i wagi na liczby
+        int height = Integer.parseInt(heightStr);
+        int weight = Integer.parseInt(weightStr);
 
         int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
         RadioButton selectedRoleRadioButton = findViewById(selectedRoleId);
         String role = selectedRoleRadioButton.getText().toString();
 
+        int selectedGenderId = radioGroupGender.getCheckedRadioButtonId();
+        RadioButton selectedGenderRadioButton = findViewById(selectedGenderId);
+        String gender = selectedGenderRadioButton.getText().toString();
+
         userDatabase.child("imie").setValue(firstName);
         userDatabase.child("nazwisko").setValue(lastName);
         userDatabase.child("dataUrodzenia").setValue(dateOfBirth);
+        userDatabase.child("wzrost").setValue(height);
+        userDatabase.child("waga").setValue(weight);
         userDatabase.child("czyLekarz").setValue(role.equals("Lekarz"));
+        userDatabase.child("płeć").setValue(gender);
 
         Toast.makeText(this, "Dane zapisane", Toast.LENGTH_SHORT).show();
 
