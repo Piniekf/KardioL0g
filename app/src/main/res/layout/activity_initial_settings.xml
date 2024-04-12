@@ -76,6 +76,26 @@
             android:text="Lekarz" />
     </RadioGroup>
 
+    <!-- Dodatkowe pola dla osoby kontaktowej (tylko widoczne dla pacjenta) -->
+    <LinearLayout
+        android:id="@+id/layoutContactInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/editTextContactPerson"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Osoba kontaktowa" />
+        <EditText
+            android:id="@+id/editTextContactPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Numer telefonu kontaktowej osoby" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/buttonSave"
         android:layout_width="match_parent"

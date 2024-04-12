@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -23,9 +24,11 @@ import java.util.Calendar;
 public class InitialSettingsActivity extends AppCompatActivity {
 
     private EditText editTextFirstName, editTextLastName, editTextDateOfBirth, editTextHeight, editTextWeight;
+    private EditText editTextContactPerson, editTextContactFirstName, editTextContactLastName, editTextContactPhoneNumber;
     private RadioGroup radioGroupRole, radioGroupGender;
     private Button buttonSave;
     private DatabaseReference userDatabase;
+    private LinearLayout layoutContactInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +42,28 @@ public class InitialSettingsActivity extends AppCompatActivity {
         editTextDateOfBirth = findViewById(R.id.editTextDateOfBirth);
         editTextHeight = findViewById(R.id.editTextHeight);
         editTextWeight = findViewById(R.id.editTextWeight);
+        editTextContactPerson = findViewById(R.id.editTextContactPerson);
+        editTextContactPhoneNumber = findViewById(R.id.editTextContactPhoneNumber);
         radioGroupRole = findViewById(R.id.radioGroupRole);
         radioGroupGender = findViewById(R.id.radioGroupGender);
         buttonSave = findViewById(R.id.buttonSave);
+        layoutContactInfo = findViewById(R.id.layoutContactInfo);
 
         editTextDateOfBirth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePickerDialog();
+            }
+        });
+
+        radioGroupRole.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.radioButtonPatient) {
+                    layoutContactInfo.setVisibility(View.VISIBLE);
+                } else {
+                    layoutContactInfo.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -84,6 +101,10 @@ public class InitialSettingsActivity extends AppCompatActivity {
         String dateOfBirth = editTextDateOfBirth.getText().toString().trim();
         String heightStr = editTextHeight.getText().toString().trim();
         String weightStr = editTextWeight.getText().toString().trim();
+        String contactPerson = editTextContactPerson.getText().toString().trim();
+        String contactFirstName = editTextContactFirstName.getText().toString().trim();
+        String contactLastName = editTextContactLastName.getText().toString().trim();
+        String contactPhoneNumber = editTextContactPhoneNumber.getText().toString().trim();
 
         // Walidacja pól
         if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(dateOfBirth) ||
@@ -112,6 +133,11 @@ public class InitialSettingsActivity extends AppCompatActivity {
         userDatabase.child("waga").setValue(weight);
         userDatabase.child("czyLekarz").setValue(role.equals("Lekarz"));
         userDatabase.child("płeć").setValue(gender);
+
+        if (role.equals("Pacjent")) {
+            userDatabase.child("osobaKontaktowa").setValue(contactPerson);
+            userDatabase.child("numerTelefonuKontaktowej").setValue(contactPhoneNumber);
+        }
 
         Toast.makeText(this, "Dane zapisane", Toast.LENGTH_SHORT).show();
 
