@@ -23,8 +23,7 @@ import java.util.Calendar;
 
 public class InitialSettingsActivity extends AppCompatActivity {
 
-    private EditText editTextFirstName, editTextLastName, editTextDateOfBirth, editTextHeight, editTextWeight;
-    private EditText editTextContactPerson, editTextContactFirstName, editTextContactLastName, editTextContactPhoneNumber;
+    private EditText editTextFirstName, editTextLastName, editTextDateOfBirth, editTextHeight, editTextWeight, editTextContactPerson, editTextContactPhoneNumber;
     private RadioGroup radioGroupRole, radioGroupGender;
     private Button buttonSave;
     private DatabaseReference userDatabase;
@@ -102,21 +101,22 @@ public class InitialSettingsActivity extends AppCompatActivity {
         String heightStr = editTextHeight.getText().toString().trim();
         String weightStr = editTextWeight.getText().toString().trim();
         String contactPerson = editTextContactPerson.getText().toString().trim();
-        String contactFirstName = editTextContactFirstName.getText().toString().trim();
-        String contactLastName = editTextContactLastName.getText().toString().trim();
         String contactPhoneNumber = editTextContactPhoneNumber.getText().toString().trim();
 
         // Walidacja pól
-        if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(dateOfBirth) ||
-                TextUtils.isEmpty(heightStr) || TextUtils.isEmpty(weightStr) ||
+        if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                 radioGroupRole.getCheckedRadioButtonId() == -1 || radioGroupGender.getCheckedRadioButtonId() == -1) {
             Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Konwersja wzrostu i wagi na liczby
-        int height = Integer.parseInt(heightStr);
-        int weight = Integer.parseInt(weightStr);
+        int height = 0;
+        int weight = 0;
+        if (!TextUtils.isEmpty(heightStr) && !TextUtils.isEmpty(weightStr)) {
+            height = Integer.parseInt(heightStr);
+            weight = Integer.parseInt(weightStr);
+        }
 
         int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
         RadioButton selectedRoleRadioButton = findViewById(selectedRoleId);
@@ -128,13 +128,17 @@ public class InitialSettingsActivity extends AppCompatActivity {
 
         userDatabase.child("imie").setValue(firstName);
         userDatabase.child("nazwisko").setValue(lastName);
-        userDatabase.child("dataUrodzenia").setValue(dateOfBirth);
-        userDatabase.child("wzrost").setValue(height);
-        userDatabase.child("waga").setValue(weight);
         userDatabase.child("czyLekarz").setValue(role.equals("Lekarz"));
         userDatabase.child("płeć").setValue(gender);
 
         if (role.equals("Pacjent")) {
+            if (TextUtils.isEmpty(dateOfBirth) || height == 0 || weight == 0) {
+                Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            userDatabase.child("dataUrodzenia").setValue(dateOfBirth);
+            userDatabase.child("wzrost").setValue(height);
+            userDatabase.child("waga").setValue(weight);
             userDatabase.child("osobaKontaktowa").setValue(contactPerson);
             userDatabase.child("numerTelefonuKontaktowej").setValue(contactPhoneNumber);
         }
