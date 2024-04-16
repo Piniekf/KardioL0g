@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="appred">#d52a2a</color>
+    <color name="grey">#aaa</color>
+    <color name="darkGrey">#ff424242</color>
 </resources>
