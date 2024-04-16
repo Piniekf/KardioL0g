@@ -5,21 +5,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InitialSettingsActivity extends AppCompatActivity {
 
@@ -28,12 +39,14 @@ public class InitialSettingsActivity extends AppCompatActivity {
     private Button buttonSave;
     private DatabaseReference userDatabase;
     private LinearLayout layoutContactInfo;
+    private Spinner doctorSpinner;
+    private ArrayAdapter<String> doctorAdapter;
+    private Map<String, String> doctorMap; // Mapa przechowująca imiona i nazwiska lekarzy z ich UID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initial_settings);
-
         userDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         editTextFirstName = findViewById(R.id.editTextFirstName);
@@ -47,6 +60,30 @@ public class InitialSettingsActivity extends AppCompatActivity {
         radioGroupGender = findViewById(R.id.radioGroupGender);
         buttonSave = findViewById(R.id.buttonSave);
         layoutContactInfo = findViewById(R.id.layoutContactInfo);
+        doctorSpinner = findViewById(R.id.doctorSpinner);
+        doctorMap = new HashMap<>();
+
+        DatabaseReference doctorsRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        doctorsRef.orderByChild("czyLekarz").equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> doctorNames = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String doctorName = snapshot.child("imie").getValue(String.class) + " " + snapshot.child("nazwisko").getValue(String.class);
+                    String doctorUid = snapshot.getKey(); // Pobierz UID lekarza
+                    doctorMap.put(doctorName, doctorUid); // Dodaj parę imię + nazwisko -> UID do mapy
+                    doctorNames.add(doctorName);
+                }
+                doctorAdapter = new ArrayAdapter<>(InitialSettingsActivity.this, android.R.layout.simple_spinner_item, doctorNames);
+                doctorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                doctorSpinner.setAdapter(doctorAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Obsługa błędu
+            }
+        });
 
         editTextDateOfBirth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,19 +140,57 @@ public class InitialSettingsActivity extends AppCompatActivity {
         String contactPerson = editTextContactPerson.getText().toString().trim();
         String contactPhoneNumber = editTextContactPhoneNumber.getText().toString().trim();
 
-        // Walidacja pól
         if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                 radioGroupRole.getCheckedRadioButtonId() == -1 || radioGroupGender.getCheckedRadioButtonId() == -1) {
             Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Konwersja wzrostu i wagi na liczby
+        if (!isValidName(firstName) || !isValidName(lastName)) {
+            Toast.makeText(this, "Imię i nazwisko nie mogą zawierać cyfr", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidDate(dateOfBirth)) {
+            Toast.makeText(this, "Niepoprawny format daty urodzenia. Wymagany format: DD/MM/RRRR", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidHeight(heightStr)) {
+            Toast.makeText(this, "Wzrost musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidWeight(weightStr)) {
+            Toast.makeText(this, "Waga musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!TextUtils.isEmpty(contactPhoneNumber) && !isValidPhoneNumber(contactPhoneNumber)) {
+            Toast.makeText(this, "Numer telefonu musi składać się z 9 cyfr", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!isValidContactPerson(contactPerson)) {
+            Toast.makeText(this, "Osoba kontaktowa nie może zawierać cyfr", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
         int height = 0;
         int weight = 0;
         if (!TextUtils.isEmpty(heightStr) && !TextUtils.isEmpty(weightStr)) {
-            height = Integer.parseInt(heightStr);
-            weight = Integer.parseInt(weightStr);
+            try {
+                height = Integer.parseInt(heightStr);
+                weight = Integer.parseInt(weightStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Wzrost i waga muszą być liczbami całkowitymi", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        if (!TextUtils.isEmpty(contactPhoneNumber) && !contactPhoneNumber.matches("\\d{9}")) {
+            Toast.makeText(this, "Numer telefonu musi składać się z 9 cyfr", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
@@ -141,6 +216,11 @@ public class InitialSettingsActivity extends AppCompatActivity {
             userDatabase.child("waga").setValue(weight);
             userDatabase.child("osobaKontaktowa").setValue(contactPerson);
             userDatabase.child("numerTelefonuKontaktowej").setValue(contactPhoneNumber);
+
+            // Zapisz UID wybranego lekarza
+            String selectedDoctorName = doctorSpinner.getSelectedItem().toString();
+            String selectedDoctorUid = doctorMap.get(selectedDoctorName);
+            userDatabase.child("lekarzProwadzacyUid").setValue(selectedDoctorUid);
         }
 
         Toast.makeText(this, "Dane zapisane", Toast.LENGTH_SHORT).show();
@@ -148,4 +228,28 @@ public class InitialSettingsActivity extends AppCompatActivity {
         startActivity(new Intent(InitialSettingsActivity.this, MainActivity.class));
         finish();
     }
+    private boolean isValidName(String name) {
+        return !name.matches(".*\\d.*");
+    }
+
+    private boolean isValidDate(String date) {
+        return date.matches("([0-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/\\d{4}");
+    }
+
+    private boolean isValidHeight(String height) {
+        return height.matches("\\d+");
+    }
+
+    private boolean isValidWeight(String weight) {
+        return weight.matches("\\d+");
+    }
+
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.matches("\\d{9}");
+    }
+    private boolean isValidContactPerson(String contactPerson) {
+        return !contactPerson.isEmpty() && !contactPerson.matches(".*\\d.*");
+    }
 }
+
+
