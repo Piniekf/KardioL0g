@@ -150,29 +150,39 @@ public class InitialSettingsActivity extends AppCompatActivity {
             Toast.makeText(this, "Imię i nazwisko nie mogą zawierać cyfr", Toast.LENGTH_SHORT).show();
             return;
         }
+        int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
+        RadioButton selectedRoleRadioButton = findViewById(selectedRoleId);
+        String role = selectedRoleRadioButton.getText().toString();
 
-        if (!isValidDate(dateOfBirth)) {
-            Toast.makeText(this, "Niepoprawny format daty urodzenia. Wymagany format: DD/MM/RRRR", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        int selectedGenderId = radioGroupGender.getCheckedRadioButtonId();
+        RadioButton selectedGenderRadioButton = findViewById(selectedGenderId);
+        String gender = selectedGenderRadioButton.getText().toString();
+        if (role.equals("Pacjent")) {
+            // Sprawdzaj walidacje tylko dla pacjentów
+            if (!isValidDate(dateOfBirth)) {
+                Toast.makeText(this, "Niepoprawny format daty urodzenia. Wymagany format: DD/MM/RRRR", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        if (!isValidHeight(heightStr)) {
-            Toast.makeText(this, "Wzrost musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
-            return;
-        }
+            if (!isValidHeight(heightStr)) {
+                Toast.makeText(this, "Wzrost musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        if (!isValidWeight(weightStr)) {
-            Toast.makeText(this, "Waga musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
-            return;
-        }
+            if (!isValidWeight(weightStr)) {
+                Toast.makeText(this, "Waga musi być liczbą całkowitą", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        if (!TextUtils.isEmpty(contactPhoneNumber) && !isValidPhoneNumber(contactPhoneNumber)) {
-            Toast.makeText(this, "Numer telefonu musi składać się z 9 cyfr", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!isValidContactPerson(contactPerson)) {
-            Toast.makeText(this, "Osoba kontaktowa nie może zawierać cyfr", Toast.LENGTH_SHORT).show();
-            return;
+            if (!TextUtils.isEmpty(contactPhoneNumber) && !isValidPhoneNumber(contactPhoneNumber)) {
+                Toast.makeText(this, "Numer telefonu musi składać się z 9 cyfr", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isValidContactPerson(contactPerson)) {
+                Toast.makeText(this, "Osoba kontaktowa nie może zawierać cyfr", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
 
@@ -188,18 +198,7 @@ public class InitialSettingsActivity extends AppCompatActivity {
             }
         }
 
-        if (!TextUtils.isEmpty(contactPhoneNumber) && !contactPhoneNumber.matches("\\d{9}")) {
-            Toast.makeText(this, "Numer telefonu musi składać się z 9 cyfr", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
-        RadioButton selectedRoleRadioButton = findViewById(selectedRoleId);
-        String role = selectedRoleRadioButton.getText().toString();
-
-        int selectedGenderId = radioGroupGender.getCheckedRadioButtonId();
-        RadioButton selectedGenderRadioButton = findViewById(selectedGenderId);
-        String gender = selectedGenderRadioButton.getText().toString();
 
         userDatabase.child("imie").setValue(firstName);
         userDatabase.child("nazwisko").setValue(lastName);
@@ -251,5 +250,3 @@ public class InitialSettingsActivity extends AppCompatActivity {
         return !contactPerson.isEmpty() && !contactPerson.matches(".*\\d.*");
     }
 }
-
-

@@ -138,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, new HomeFragment()).commit();
                 break;
             case R.id.nav_settings:
-                Toast.makeText(this, "Ustawienia!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent (MainActivity.this, SettingsActivity.class));
+                finish();
                 break;
             case R.id.nav_share:
                 startActivity(new Intent (MainActivity.this, QRCodeActivity.class));
