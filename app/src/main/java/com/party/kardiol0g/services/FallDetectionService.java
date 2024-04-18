@@ -29,7 +29,7 @@ public class FallDetectionService extends Service implements SensorEventListener
     private static final float ALPHA = 0.8f; // Współczynnik filtra dolnoprzepustowego
     private static final int TIME_THRESHOLD = 500; // Minimalny czas trwania przewrócenia (w milisekundach)
     private static final int ANGLE_THRESHOLD = 60; // Prog zmiany kierunku ruchu (w stopniach)
-    private static final float SPEED_THRESHOLD = 2.0f; // Prog prędkości ruchu (w m/s)
+    private static final float SPEED_THRESHOLD = 1.0f; // Prog prędkości ruchu (w m/s)
     private long lastFallTime = 0;
     private float lastX, lastY, lastZ;
     private float lastSpeed = 0;
