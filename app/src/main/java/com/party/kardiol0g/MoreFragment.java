@@ -1,6 +1,7 @@
 package com.party.kardiol0g;
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -19,7 +20,9 @@ public class MoreFragment extends Fragment {
 
     CheckBox checkBoxFallSensor;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
-
+    public static final String PREFS_NAME = "MyPrefsFile";
+    public static final String FALL_SENSOR_ENABLED = "fallSensorEnabled";
+    private boolean fallSensorEnabled;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,6 +30,12 @@ public class MoreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_more, container, false);
 
         checkBoxFallSensor = view.findViewById(R.id.checkBoxFallSensor);
+
+        // Odczytaj stan checkboxa z SharedPreferences
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        fallSensorEnabled = settings.getBoolean(FALL_SENSOR_ENABLED, false);
+        checkBoxFallSensor.setChecked(fallSensorEnabled);
+
         checkBoxFallSensor.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // Rozpocznij usługę wykrywania upadków
@@ -38,6 +47,17 @@ public class MoreFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Zapisz aktualny stan checkboxa w SharedPreferences
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(FALL_SENSOR_ENABLED, checkBoxFallSensor.isChecked());
+        editor.apply();
     }
 
     private void startFallDetectionService() {
@@ -61,7 +81,7 @@ public class MoreFragment extends Fragment {
                 // Użytkownik udzielił zgody, uruchom usługę wykrywania upadków
                 startFallDetectionService();
             } else {
-                // Użytkownik nie udzielił zgody, możesz obsłużyć to odpowiednio (np. wyświetlić komunikat)
+                // Użytkownik nie udzielił zgody
             }
         }
     }

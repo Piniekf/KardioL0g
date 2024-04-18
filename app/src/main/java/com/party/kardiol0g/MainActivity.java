@@ -1,5 +1,8 @@
 package com.party.kardiol0g;
 
+import static com.party.kardiol0g.MoreFragment.FALL_SENSOR_ENABLED;
+import static com.party.kardiol0g.MoreFragment.PREFS_NAME;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +43,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.party.kardiol0g.services.FallDetectionService;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -95,6 +99,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Obsługa błędu pobierania danych
                 }
             });
+        }
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        boolean fallSensorEnabled = settings.getBoolean(FALL_SENSOR_ENABLED, false);
+        if (fallSensorEnabled) {
+            // Jeśli usługa jest włączona, uruchom ją
+            Intent serviceIntent = new Intent(this, FallDetectionService.class);
+            startService(serviceIntent);
         }
 
         if (savedInstanceState == null) {
