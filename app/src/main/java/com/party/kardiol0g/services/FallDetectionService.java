@@ -24,7 +24,14 @@ public class FallDetectionService extends Service implements SensorEventListener
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private boolean isFallDetected = false;
-    private static final float FALL_THRESHOLD = 10; // Ustaw próg detekcji upadku
+    private static final float FALL_THRESHOLD = 8.0f; // Prog detekcji upadku
+    private static final float ALPHA = 0.8f; // Współczynnik filtra dolnoprzepustowego
+    private static final int TIME_THRESHOLD = 500; // Minimalny czas trwania przewrócenia (w milisekundach)
+    private static final int ANGLE_THRESHOLD = 60; // Prog zmiany kierunku ruchu (w stopniach)
+    private static final float SPEED_THRESHOLD = 2.0f; // Prog prędkości ruchu (w m/s)
+    private long lastFallTime = 0;
+    private float lastX, lastY, lastZ;
+    private float lastSpeed = 0;
 
     @Override
     public void onCreate() {
@@ -46,17 +53,32 @@ public class FallDetectionService extends Service implements SensorEventListener
         float y = event.values[1];
         float z = event.values[2];
 
-        // Wykrywanie upadku na podstawie akcelerometru
+        // Filtracja danych z akcelerometru
+        x = lowPass(x, lastX);
+        y = lowPass(y, lastY);
+        z = lowPass(z, lastZ);
+
+        // Obliczenie przyspieszenia
         double acceleration = Math.sqrt(x * x + y * y + z * z);
-        if (acceleration < FALL_THRESHOLD) {
-            // Upadek został wykryty
-            if (!isFallDetected) {
+
+        // Sprawdzenie warunków wykrycia przewrócenia się
+        if (isFallDetected(x, y, z, acceleration)) {
+            // Przewrócenie się zostało wykryte
+            long currentTime = System.currentTimeMillis();
+            if (!isFallDetected || (currentTime - lastFallTime) > TIME_THRESHOLD) {
                 isFallDetected = true;
+                lastFallTime = currentTime;
                 sendSMS();
             }
         } else {
+            // Brak przewrócenia się
             isFallDetected = false;
         }
+
+        // Zapisanie poprzednich danych
+        lastX = x;
+        lastY = y;
+        lastZ = z;
     }
 
     @Override
@@ -70,6 +92,39 @@ public class FallDetectionService extends Service implements SensorEventListener
         return null;
     }
 
+    // Metoda filtrująca dolnoprzepustowa
+    private float lowPass(float current, float last) {
+        return last + ALPHA * (current - last);
+    }
+
+    // Metoda sprawdzająca warunki wykrycia przewrócenia się
+    private boolean isFallDetected(float x, float y, float z, double acceleration) {
+        // Warunek wykrycia upadku na podstawie przyspieszenia
+        if (acceleration < FALL_THRESHOLD) {
+            // Sprawdzenie zmiany kierunku ruchu
+            float angle = calculateAngle(x, y, z);
+            // Sprawdzenie zmiany prędkości ruchu
+            float speed = calculateSpeed(x, y, z);
+            return angle > ANGLE_THRESHOLD && speed > SPEED_THRESHOLD;
+        }
+        return false;
+    }
+
+    // Metoda obliczająca kąt zmiany kierunku ruchu
+    private float calculateAngle(float x, float y, float z) {
+        float angle = (float) Math.toDegrees(Math.atan2(x, Math.sqrt(y * y + z * z)));
+        return Math.abs(angle);
+    }
+
+    // Metoda obliczająca prędkość ruchu
+    private float calculateSpeed(float x, float y, float z) {
+        // Obliczenie zmiany prędkości na podstawie danych z akcelerometru
+        float speed = Math.abs((x + y + z) - (lastX + lastY + lastZ));
+        lastSpeed = speed;
+        return speed;
+    }
+
+    // Metoda wysyłająca SMS
     private void sendSMS() {
         // Pobierz numer telefonu kontaktowego z Firebase
         String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -81,7 +136,7 @@ public class FallDetectionService extends Service implements SensorEventListener
                     String phoneNumber = dataSnapshot.child("numerTelefonuKontaktowej").getValue(String.class);
                     // Wyślij SMS
                     SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(phoneNumber, null, "Upadek wykryty!", null, null);
+                    smsManager.sendTextMessage(phoneNumber, null, "Przewrócenie się wykryte!", null, null);
                 }
             }
 
