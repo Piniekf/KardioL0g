@@ -1,13 +1,10 @@
 package com.party.kardiol0g;
 
-import static com.party.kardiol0g.MoreFragment.FALL_SENSOR_ENABLED;
-import static com.party.kardiol0g.MoreFragment.PREFS_NAME;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -16,9 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -29,7 +24,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     boolean nightMode;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +91,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Obsługa błędu pobierania danych
                 }
             });
-        }
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        boolean fallSensorEnabled = settings.getBoolean(FALL_SENSOR_ENABLED, false);
-        if (fallSensorEnabled) {
-            // Jeśli usługa jest włączona, uruchom ją
-            Intent serviceIntent = new Intent(this, FallDetectionService.class);
-            startService(serviceIntent);
         }
 
         if (savedInstanceState == null) {
