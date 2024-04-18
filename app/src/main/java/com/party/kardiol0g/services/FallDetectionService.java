@@ -1,11 +1,6 @@
 package com.party.kardiol0g.services;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -17,7 +12,6 @@ import android.telephony.SmsManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.party.kardiol0g.R;
 
 public class FallDetectionService extends Service implements SensorEventListener {
 
@@ -41,14 +34,9 @@ public class FallDetectionService extends Service implements SensorEventListener
     private float lastX, lastY, lastZ;
     private float lastSpeed = 0;
 
-    private static final String CHANNEL_ID = "FallDetectionServiceChannel";
-    private static final int NOTIFICATION_ID = 123;
-
     @Override
     public void onCreate() {
         super.onCreate();
-        createNotificationChannel();
-        startForegroundService();
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -148,7 +136,7 @@ public class FallDetectionService extends Service implements SensorEventListener
                     String phoneNumber = dataSnapshot.child("numerTelefonuKontaktowej").getValue(String.class);
                     // Wyślij SMS
                     SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(phoneNumber, null, "Przewrócenie się wykryte!", null, null);
+                    smsManager.sendTextMessage(phoneNumber, null, "Upadek wykryty!", null, null);
                 }
             }
 
@@ -158,35 +146,4 @@ public class FallDetectionService extends Service implements SensorEventListener
             }
         });
     }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Fall Detection Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
-        }
-    }
-
-    private void startForegroundService() {
-        Intent notificationIntent = new Intent(this, FallDetectionService.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Fall Detection Service")
-                .setContentText("Serwis wykrywania upadków działa w tle")
-                .setSmallIcon(R.drawable.baseline_notifications_24)
-                .setContentIntent(pendingIntent)
-                .build();
-
-        startForeground(NOTIFICATION_ID, notification);
-
-    }
-
 }
-
-
