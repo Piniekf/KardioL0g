@@ -1,7 +1,9 @@
 package com.party.kardiol0g.services;
 
 import android.Manifest;
+
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -9,6 +11,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -17,15 +22,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 
 public class FallDetectionService extends Service implements SensorEventListener {
 
@@ -41,7 +44,6 @@ public class FallDetectionService extends Service implements SensorEventListener
     private float lastX, lastY, lastZ;
     private float lastSpeed = 0;
     private String contactPhoneNumber;
-
 
     @Override
     public void onCreate() {
@@ -99,7 +101,7 @@ public class FallDetectionService extends Service implements SensorEventListener
                 sendSMS();
             }
         } else {
-            // Brak przewrócenia się
+            // Brak przewrócenie się
             isFallDetected = false;
         }
 
@@ -156,14 +158,13 @@ public class FallDetectionService extends Service implements SensorEventListener
         // Sprawdź, czy numer telefonu został pobrany
         if (contactPhoneNumber != null) {
             // Pobierz aktualną lokalizację
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // Sprawdzanie dostepu do lokalizacji, w MoreFragments jest ale metoda wymaga
                 return;
             }
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
                 @Override
-                public void onSuccess(@Nullable Location location) {
+                public void onLocationChanged(Location location) {
                     if (location != null) {
                         // Utwórz adres URL do mapy
                         String mapUrl = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
@@ -182,10 +183,18 @@ public class FallDetectionService extends Service implements SensorEventListener
                         smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty!", null, null);
                     }
                 }
-            });
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                @Override
+                public void onProviderEnabled(String provider) {}
+
+                @Override
+                public void onProviderDisabled(String provider) {}
+            }, null);
         } else {
             Log.w("FallDetectionService", "Numer telefonu kontaktowego nie jest dostępny");
         }
     }
-
 }
