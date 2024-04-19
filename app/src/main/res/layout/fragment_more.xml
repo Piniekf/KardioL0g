@@ -77,34 +77,4 @@
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/notificationsCardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        android:layout_below="@id/criticalInfoCardView"
-        android:layout_marginTop="16dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/notificationsTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:text="Czy zezwalasz na powiadomienia"
-                android:layout_centerVertical="true"/>
-
-            <CheckBox
-                android:id="@+id/checkBoxNotifications"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
 </RelativeLayout>

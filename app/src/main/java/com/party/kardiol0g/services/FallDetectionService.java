@@ -168,10 +168,6 @@ public class FallDetectionService extends Service implements SensorEventListener
                     if (location != null) {
                         // Utwórz adres URL do mapy
                         String mapUrl = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
-
-                        // Sformatuj wiadomość SMS
-                        String message = "Upadek wykryty! Zobacz lokalizację: " + mapUrl;
-
                         // Wyślij SMS
                         SmsManager smsManager = SmsManager.getDefault();
                         smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty! Lokalizacja: " + mapUrl, null, null);

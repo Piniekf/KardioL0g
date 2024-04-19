@@ -20,7 +20,7 @@ public class MoreFragment extends Fragment {
 
     CheckBox checkBoxFallSensor;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
-    private static final int MY_PERMISSIONS_REQUEST_LOCATION = 2; // Zadeklaruj stałą z unikalnym kodem żądania
+    private static final int MY_PERMISSIONS_REQUEST_LOCATION = 2;
 
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String FALL_SENSOR_ENABLED = "fallSensorEnabled";
