@@ -20,6 +20,8 @@ public class MoreFragment extends Fragment {
 
     CheckBox checkBoxFallSensor;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
+    private static final int MY_PERMISSIONS_REQUEST_LOCATION = 2; // Zadeklaruj stałą z unikalnym kodem żądania
+
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String FALL_SENSOR_ENABLED = "fallSensorEnabled";
     private boolean fallSensorEnabled;
@@ -65,11 +67,19 @@ public class MoreFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             // Brak uprawnień, poproś użytkownika o zgodę
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
-        } else {
-            // Masz uprawnienia, uruchom usługę wykrywania upadków
-            Intent serviceIntent = new Intent(getActivity(), FallDetectionService.class);
-            getActivity().startService(serviceIntent);
+            return;  // Wróć z metody, jeśli nie ma uprawnień do wysyłania SMS
         }
+
+        // Sprawdź uprawnienia do lokalizacji
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Brak uprawnień, poproś użytkownika o zgodę
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+            return;  // Wróć z metody, jeśli nie ma uprawnień do lokalizacji
+        }
+
+        // Masz uprawnienia, uruchom usługę wykrywania upadków
+        Intent serviceIntent = new Intent(getActivity(), FallDetectionService.class);
+        getActivity().startService(serviceIntent);
     }
 
     @Override

@@ -1,18 +1,25 @@
 package com.party.kardiol0g.services;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -148,10 +155,34 @@ public class FallDetectionService extends Service implements SensorEventListener
     private void sendSMS() {
         // Sprawdź, czy numer telefonu został pobrany
         if (contactPhoneNumber != null) {
-            // Wyślij SMS
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty!", null, null);
-            Log.d("FallDetectionService", "SMS wysłany na numer: " + contactPhoneNumber);
+            // Pobierz aktualną lokalizację
+            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // Sprawdzanie dostepu do lokalizacji, w MoreFragments jest ale metoda wymaga
+                return;
+            }
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(@Nullable Location location) {
+                    if (location != null) {
+                        // Utwórz adres URL do mapy
+                        String mapUrl = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
+
+                        // Sformatuj wiadomość SMS
+                        String message = "Upadek wykryty! Zobacz lokalizację: " + mapUrl;
+
+                        // Wyślij SMS
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty! Lokalizacja: " + mapUrl, null, null);
+                        Log.d("FallDetectionService", "SMS wysłany na numer: " + contactPhoneNumber + " z linkiem do mapy: " + mapUrl);
+                    } else {
+                        Log.w("FallDetectionService", "Nie udało się pobrać aktualnej lokalizacji");
+                        // Wyślij SMS bez lokalizacji, jeśli nie udało się jej pobrać
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty!", null, null);
+                    }
+                }
+            });
         } else {
             Log.w("FallDetectionService", "Numer telefonu kontaktowego nie jest dostępny");
         }
