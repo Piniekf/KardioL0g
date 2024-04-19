@@ -6,9 +6,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.telephony.SmsManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +33,8 @@ public class FallDetectionService extends Service implements SensorEventListener
     private long lastFallTime = 0;
     private float lastX, lastY, lastZ;
     private float lastSpeed = 0;
+    private String contactPhoneNumber;
+
 
     @Override
     public void onCreate() {
@@ -40,6 +42,24 @@ public class FallDetectionService extends Service implements SensorEventListener
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(currentUserUid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    contactPhoneNumber = dataSnapshot.child("numerTelefonuKontaktowej").getValue(String.class);
+                    Log.d("FallDetectionService", "Pobrano numer telefonu kontaktowego: " + contactPhoneNumber);
+                } else {
+                    Log.w("FallDetectionService", "Numer telefonu kontaktowego nie został znaleziony w Firebase");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FallDetectionService", "Błąd podczas pobierania numeru telefonu z Firebase: " + databaseError.getMessage());
+            }
+        });
     }
 
     @Override
@@ -126,24 +146,15 @@ public class FallDetectionService extends Service implements SensorEventListener
 
     // Metoda wysyłająca SMS
     private void sendSMS() {
-        // Pobierz numer telefonu kontaktowego z Firebase
-        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(currentUserUid);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String phoneNumber = dataSnapshot.child("numerTelefonuKontaktowej").getValue(String.class);
-                    // Wyślij SMS
-                    SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(phoneNumber, null, "Upadek wykryty!", null, null);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Obsługa błędów
-            }
-        });
+        // Sprawdź, czy numer telefonu został pobrany
+        if (contactPhoneNumber != null) {
+            // Wyślij SMS
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty!", null, null);
+            Log.d("FallDetectionService", "SMS wysłany na numer: " + contactPhoneNumber);
+        } else {
+            Log.w("FallDetectionService", "Numer telefonu kontaktowego nie jest dostępny");
+        }
     }
+
 }
