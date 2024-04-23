@@ -42,7 +42,6 @@
             app:layout_constraintTop_toBottomOf="@id/addMedicineTitle"
             app:layout_constraintBottom_toTopOf="@id/medicineNameBox"/>
 
-        <!-- Zmieniono EditText na AutoCompleteTextView -->
         <AutoCompleteTextView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -92,7 +91,6 @@
             app:layout_constraintBottom_toBottomOf="@id/dialogBox"
             app:layout_constraintStart_toEndOf="@id/btnCancelAddMedicine"/>
 
-        <!-- Dodano ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

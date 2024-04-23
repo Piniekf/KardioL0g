@@ -1,0 +1,9 @@
+<resources>
+    <string-array name="dawka_options">
+        <item>łyżeczka</item>
+        <item>mg</item>
+        <item>ml</item>
+        <item>tabletka</item>
+        <item>kropla</item>
+    </string-array>
+</resources>
