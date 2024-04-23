@@ -41,7 +41,8 @@
             app:layout_constraintTop_toBottomOf="@id/addMedicineTitle"
             app:layout_constraintBottom_toTopOf="@id/medicineNameBox"/>
 
-        <EditText
+        <!-- Zmieniono EditText na AutoCompleteTextView -->
+        <AutoCompleteTextView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:id="@+id/medicineNameBox"
@@ -65,7 +66,7 @@
             android:textColor="@color/white"
             android:backgroundTint="@color/appred"
             android:textSize="14sp"
-            app:cornerRadius = "20dp"
+            app:cornerRadius="20dp"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -85,7 +86,7 @@
             android:textColor="@color/white"
             android:backgroundTint="@color/appred"
             android:textSize="14sp"
-            app:cornerRadius = "20dp"
+            app:cornerRadius="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/dialogBox"
             app:layout_constraintStart_toEndOf="@id/btnCancelAddMedicine"/>

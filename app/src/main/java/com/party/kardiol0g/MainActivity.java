@@ -21,7 +21,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +31,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,6 +56,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.party.kardiol0g.services.FallDetectionService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -238,7 +245,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_medicine, null);
-                EditText medicineNameBox = dialogView.findViewById(R.id.medicineNameBox);
+                AutoCompleteTextView medicineNameBox = dialogView.findViewById(R.id.medicineNameBox);
+                Button btnAddMedicine = dialogView.findViewById(R.id.btnAddMedicine);
+
+                // Deklaracja listy medicineNames
+                List<String> medicineNames = new ArrayList<>();
+
+                // Pobierz listę leków z Firestore i ustaw ją jako źródło podpowiedzi dla AutoCompleteTextView
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                CollectionReference medicinesRef = db.collection("medicines");
+
+                medicinesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String medicineName = document.getString("Nazwa Produktu Leczniczego");
+                                if (medicineName != null) {
+                                    medicineNames.add(medicineName);
+                                }
+                            }
+
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, medicineNames);
+                            medicineNameBox.setAdapter(adapter);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Błąd pobierania nazw leków: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                // Dodaj nasłuchiwacz na zmiany w polu AutoCompleteTextView
+                medicineNameBox.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        // Sprawdź, czy wpisany tekst pasuje do jednej z sugerowanych opcji
+                        String enteredText = editable.toString();
+                        if (medicineNames.contains(enteredText)) {
+                            // Włącz przycisk dodawania, jeśli wpisany tekst pasuje do jednej z sugerowanych opcji
+                            btnAddMedicine.setEnabled(true);
+                            btnAddMedicine.setAlpha(1f); // Przywróć normalną widoczność przycisku
+                        } else {
+                            // Wyłącz przycisk dodawania, jeśli wpisany tekst nie pasuje do żadnej z sugerowanych opcji
+                            btnAddMedicine.setEnabled(false);
+                            btnAddMedicine.setAlpha(0.5f); // Wyszarz przycisk
+                        }
+                    }
+                });
 
                 builder.setView(dialogView);
                 androidx.appcompat.app.AlertDialog dialog = builder.create();
@@ -253,30 +311,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             return;
                         }
 
-                        // Pobieranie listy leków pasujących do wprowadzonej nazwy z Firestore
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        CollectionReference medicinesRef = db.collection("medicines");
-
-                        Query query = medicinesRef.whereEqualTo("Nazwa Produktu Leczniczego", medicineName);
-                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        // Tutaj możesz obsłużyć pobraną listę leków
-                                        String medicineId = document.getId();
-                                        // Możesz również pobrać inne dane dotyczące leku
-                                        // np. document.getString("jakieś_pole")
-
-                                        // Przykładowe działanie po pobraniu leków z Firestore
-                                        Toast.makeText(MainActivity.this, "Pobrano lek: " + medicineId, Toast.LENGTH_SHORT).show();
+                        // Sprawdzamy, czy wybrany lek już istnieje w bazie danych użytkownika
+                        FirebaseUser currentUser = mAuth.getCurrentUser();
+                        if (currentUser != null) {
+                            DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Medicines");
+                            userMedicinesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    boolean isMedicineExists = false;
+                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                        String existingMedicineName = snapshot.getValue(String.class);
+                                        if (existingMedicineName != null && existingMedicineName.equals(medicineName)) {
+                                            // Jeśli lek już istnieje w bazie danych użytkownika, ustaw flagę isMedicineExists na true i przerwij pętlę
+                                            isMedicineExists = true;
+                                            break;
+                                        }
                                     }
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Błąd pobierania leków: " + task.getException(), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
 
+                                    if (isMedicineExists) {
+                                        // Wyświetl komunikat, że lek już istnieje w bazie danych użytkownika
+                                        Toast.makeText(MainActivity.this, "Ten lek już istnieje w Twojej liście", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        // Dodaj nowy lek do bazy danych użytkownika
+                                        userMedicinesRef.push().setValue(medicineName);
+                                        // Wyświetl komunikat potwierdzający dodanie leku
+                                        Toast.makeText(MainActivity.this, "Lek dodany pomyślnie", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    // Obsługa błędu pobierania danych
+                                    Toast.makeText(MainActivity.this, "Błąd: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat o błędzie
+                            Toast.makeText(MainActivity.this, "Nie można dodać leku. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // Zamknij dialog
                         dialog.dismiss();
                     }
                 });
@@ -284,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialogView.findViewById(R.id.btnCancelAddMedicine).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        // Zamknij dialog
                         dialog.dismiss();
                     }
                 });
@@ -294,6 +369,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.show();
             }
         });
+
+
+
 
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override
