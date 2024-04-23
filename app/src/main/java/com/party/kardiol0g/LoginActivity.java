@@ -4,14 +4,13 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
@@ -32,19 +31,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText loginEmail, loginPassword;
-    private TextView signupRedirectText;
+    private TextView signupRedirectText, forgotPassword;
     private Button loginButton;
     private FirebaseAuth auth;
-    TextView forgotPassword;
-    GoogleSignInButton googleBtn;
-    GoogleSignInOptions gOptions;
-    GoogleSignInClient gClient;
-
+    private GoogleSignInButton googleBtn;
+    private GoogleSignInOptions gOptions;
+    private GoogleSignInClient gClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,29 +57,23 @@ public class LoginActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
+        // Sprawdź, czy użytkownik jest już zalogowany przy starcie aplikacji
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            // Przekieruj bezpośrednio do MainActivity, jeśli użytkownik jest już zalogowany
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish(); // Nie pozostawiaj LoginActivity na stosie zadań
+        }
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
 
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
-                        auth.signInWithEmailAndPassword(email, pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
-                                        Toast.makeText(LoginActivity.this, "Logowanie powiodło się", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        finish();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(LoginActivity.this, "Logowanie nie powiodło się", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        loginUser(email, pass);
                     } else {
                         loginPassword.setError("Puste pola są niedozwolone");
                     }
@@ -145,7 +136,8 @@ public class LoginActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-        //Inside onCreate
+
+        // Konfiguracja logowania przez Google
         gOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         gClient = GoogleSignIn.getClient(this, gOptions);
 
@@ -155,11 +147,14 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
         }
-        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+
+        // Rejestracja ActivityResultLauncher dla logowania przez Google
+        ActivityResultLauncher<Intent> activityResultLauncher;
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK){
+                        if (result.getResultCode() == RESULT_OK){
                             Intent data = result.getData();
                             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                             try {
@@ -173,6 +168,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        // Obsługa kliknięcia przycisku logowania przez Google
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,5 +177,23 @@ public class LoginActivity extends AppCompatActivity {
                 activityResultLauncher.launch(signInIntent);
             }
         });
+    }
+
+    // Metoda do logowania użytkownika
+    private void loginUser(String email, String pass) {
+        auth.signInWithEmailAndPassword(email, pass)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        // Po pomyślnym zalogowaniu, zapamiętaj ten stan
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(LoginActivity.this, "Logowanie nie powiodło się", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
