@@ -1,5 +1,5 @@
 <resources>
-    <string-array name="dawka_options">
+    <string-array name="dose_options">
         <item>łyżeczka</item>
         <item>mg</item>
         <item>ml</item>
