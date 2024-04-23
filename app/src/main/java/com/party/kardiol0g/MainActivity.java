@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -247,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_medicine, null);
                 AutoCompleteTextView medicineNameBox = dialogView.findViewById(R.id.medicineNameBox);
                 Button btnAddMedicine = dialogView.findViewById(R.id.btnAddMedicine);
+                ProgressBar progressBar = dialogView.findViewById(R.id.progressBar);
 
                 // Deklaracja listy medicineNames
                 List<String> medicineNames = new ArrayList<>();
@@ -254,6 +256,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // Pobierz listę leków z Firestore i ustaw ją jako źródło podpowiedzi dla AutoCompleteTextView
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 CollectionReference medicinesRef = db.collection("medicines");
+
+                // Ustawienie wszystkich elementów jako nieaktywne początkowo
+                medicineNameBox.setEnabled(false);
+                btnAddMedicine.setEnabled(false);
 
                 medicinesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -268,11 +274,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                             ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, medicineNames);
                             medicineNameBox.setAdapter(adapter);
+
+                            // Po zakończeniu wczytywania danych, ustaw elementy jako aktywne
+                            medicineNameBox.setEnabled(true);
+                            progressBar.setVisibility(View.GONE);
                         } else {
                             Toast.makeText(MainActivity.this, "Błąd pobierania nazw leków: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+
+                // Pokaż progressBar na początku wczytywania danych
+                progressBar.setVisibility(View.VISIBLE);
 
                 // Dodaj nasłuchiwacz na zmiany w polu AutoCompleteTextView
                 medicineNameBox.addTextChangedListener(new TextWatcher() {
@@ -369,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.show();
             }
         });
-
 
 
 
