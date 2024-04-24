@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,9 +23,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,10 +31,12 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,13 +52,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.party.kardiol0g.services.FallDetectionService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -249,6 +247,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 AutoCompleteTextView medicineNameBox = dialogView.findViewById(R.id.medicineNameBox);
                 Button btnAddMedicine = dialogView.findViewById(R.id.btnAddMedicine);
                 ProgressBar progressBar = dialogView.findViewById(R.id.progressBar);
+                Spinner doseSpinner = dialogView.findViewById(R.id.doseSpinner);
+                EditText quantityEditText = dialogView.findViewById(R.id.quantityEditText);
+                CheckBox morningCheckBox = dialogView.findViewById(R.id.morningCheckBox);
+                CheckBox noonCheckBox = dialogView.findViewById(R.id.noonCheckBox);
+                CheckBox eveningCheckBox = dialogView.findViewById(R.id.eveningCheckBox);
+                EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
+
 
                 // Deklaracja listy medicineNames
                 List<String> medicineNames = new ArrayList<>();
@@ -324,6 +329,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             return;
                         }
 
+                        // Pobierz wartość dawki z Spinner
+                        String dose = doseSpinner.getSelectedItem().toString();
+
+                        // Pobierz ilość z EditText
+                        String quantity = quantityEditText.getText().toString();
+
+                        if (TextUtils.isEmpty(dose)) {
+                            Toast.makeText(MainActivity.this, "Wprowadź dawkę", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (TextUtils.isEmpty(quantity)) {
+                            Toast.makeText(MainActivity.this, "Wprowadź ilość", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Sprawdź, czy każde pole wyboru jest zaznaczone
+                        boolean isMorningChecked = morningCheckBox.isChecked();
+                        boolean isNoonChecked = noonCheckBox.isChecked();
+                        boolean isEveningChecked = eveningCheckBox.isChecked();
+
+                        // Pobierz notatkę z EditText
+                        String note = noteEditText.getText().toString();
+
                         // Sprawdzamy, czy wybrany lek już istnieje w bazie danych użytkownika
                         FirebaseUser currentUser = mAuth.getCurrentUser();
                         if (currentUser != null) {
@@ -333,7 +362,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     boolean isMedicineExists = false;
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                        String existingMedicineName = snapshot.getValue(String.class);
+                                        Map<String, Object> medicineData = (Map<String, Object>) snapshot.getValue();
+                                        String existingMedicineName = (String) medicineData.get("name");
                                         if (existingMedicineName != null && existingMedicineName.equals(medicineName)) {
                                             // Jeśli lek już istnieje w bazie danych użytkownika, ustaw flagę isMedicineExists na true i przerwij pętlę
                                             isMedicineExists = true;
@@ -345,8 +375,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         // Wyświetl komunikat, że lek już istnieje w bazie danych użytkownika
                                         Toast.makeText(MainActivity.this, "Ten lek już istnieje w Twojej liście", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        // Dodaj nowy lek do bazy danych użytkownika
-                                        userMedicinesRef.push().setValue(medicineName);
+                                        // Dodaj nowy lek do bazy danych użytkownika wraz z innymi danymi
+                                        String medicineId = userMedicinesRef.push().getKey();
+                                        userMedicinesRef.child(medicineId).child("name").setValue(medicineName);
+                                        userMedicinesRef.child(medicineId).child("dose").setValue(dose);
+                                        userMedicinesRef.child(medicineId).child("quantity").setValue(quantity);
+                                        userMedicinesRef.child(medicineId).child("morning").setValue(isMorningChecked);
+                                        userMedicinesRef.child(medicineId).child("noon").setValue(isNoonChecked);
+                                        userMedicinesRef.child(medicineId).child("evening").setValue(isEveningChecked);
+                                        userMedicinesRef.child(medicineId).child("note").setValue(note);
                                         // Wyświetl komunikat potwierdzający dodanie leku
                                         Toast.makeText(MainActivity.this, "Lek dodany pomyślnie", Toast.LENGTH_SHORT).show();
                                     }
@@ -367,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         dialog.dismiss();
                     }
                 });
+
 
                 dialogView.findViewById(R.id.btnCancelAddMedicine).setOnClickListener(new View.OnClickListener() {
                     @Override
