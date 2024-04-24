@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
+        // Obsługa fragmnetów
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             return true;
         });
+        // Obsługa guzika plus
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    // metoda od przycisku wstecz przy bocznej szufladzie
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -214,14 +217,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
-
+    // metody od zmiany framgnetu
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
-
+    // metody od dolnego menu
     private void showBottomDialog() {
         final Dialog[] dialog = {new Dialog(this)};
         dialog[0].requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -239,6 +242,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this,"Dodaj ciśnienie kliknięte",Toast.LENGTH_SHORT).show();
             }
         });
+        // Dodawanie leku
         addMedicine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -426,8 +430,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.show();
             }
         });
-
-
 
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override

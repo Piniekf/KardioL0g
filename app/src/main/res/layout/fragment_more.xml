@@ -13,7 +13,7 @@
         android:textSize="30sp"
         android:textColor="@color/appred"
         android:gravity="center"
-        android:paddingTop="50dp"/>
+        android:layout_marginTop="?attr/actionBarSize"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/fallSensorCardView"
