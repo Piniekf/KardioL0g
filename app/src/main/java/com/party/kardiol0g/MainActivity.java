@@ -272,8 +272,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String medicineName = document.getString("Nazwa Produktu Leczniczego");
-                                if (medicineName != null) {
-                                    medicineNames.add(medicineName);
+                                String medicineStrength = document.getString("Moc");
+                                if (medicineName != null && medicineStrength != null) {
+                                    medicineNames.add(medicineName + " - " + medicineStrength); // Dodaj zarówno nazwę, jak i moc do listy
                                 }
                             }
 
@@ -322,14 +323,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialogView.findViewById(R.id.btnAddMedicine).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String medicineName = medicineNameBox.getText().toString();
-
-                        if (TextUtils.isEmpty(medicineName)){
-                            Toast.makeText(MainActivity.this, "Wprowadź lek", Toast.LENGTH_SHORT).show();
+                        String medicineNameWithStrength = medicineNameBox.getText().toString();
+                        if (TextUtils.isEmpty(medicineNameWithStrength)){
+                            Toast.makeText(MainActivity.this, "Wybierz lek", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Pobierz wartość dawki z Spinner
+                        // Rozdzielanie nazwy leku i mocy
+                        String[] parts = medicineNameWithStrength.split(" - ");
+                        String medicineName = parts[0];
+                        String medicineStrength = parts[1];
+
+                        // Pobierz wartość dawki ze spinnera
                         String dose = doseSpinner.getSelectedItem().toString();
 
                         // Pobierz ilość z EditText
@@ -345,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             return;
                         }
 
-                        // Sprawdź, czy każde pole wyboru jest zaznaczone
+                        // Sprawdź, czy pole wyboru jest zaznaczone
                         boolean isMorningChecked = morningCheckBox.isChecked();
                         boolean isNoonChecked = noonCheckBox.isChecked();
                         boolean isEveningChecked = eveningCheckBox.isChecked();
@@ -378,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         // Dodaj nowy lek do bazy danych użytkownika wraz z innymi danymi
                                         String medicineId = userMedicinesRef.push().getKey();
                                         userMedicinesRef.child(medicineId).child("name").setValue(medicineName);
+                                        userMedicinesRef.child(medicineId).child("strength").setValue(medicineStrength);
                                         userMedicinesRef.child(medicineId).child("dose").setValue(dose);
                                         userMedicinesRef.child(medicineId).child("quantity").setValue(quantity);
                                         userMedicinesRef.child(medicineId).child("morning").setValue(isMorningChecked);
