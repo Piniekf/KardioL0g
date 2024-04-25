@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="20dp"
+    android:padding="20dp"
+    android:id="@+id/dialogAddPressure"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialogBox"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/white_box">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/addPressureTitle"
+            android:text="Dodaj ciśnienie"
+            android:padding="10dp"
+            android:textSize="17sp"
+            android:background="@drawable/red_round"
+            android:textColor="@color/white"
+            android:drawableLeft="@drawable/baseline_medication_24_white"
+            android:drawablePadding="8dp"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/systolicLabel"
+            android:text="Ciśnienie skurczowe"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/appred"
+            app:layout_constraintTop_toBottomOf="@id/addPressureTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/systolicLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@id/systolicLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:id="@+id/btnSystolicMinus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/systolicEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="120"
+                android:inputType="number"
+                android:textColorHint="@color/appred"
+                android:textColor="@color/appred"
+                android:backgroundTint="@color/appred"/>
+
+            <Button
+                android:id="@+id/btnSystolicPlus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/diastolicLabel"
+            android:text="Ciśnienie rozkurczowe"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/appred"
+            app:layout_constraintTop_toBottomOf="@id/systolicLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/diastolicLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@id/diastolicLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:id="@+id/btnDiastolicMinus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/diastolicEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="80"
+                android:inputType="number"
+                android:textColorHint="@color/appred"
+                android:textColor="@color/appred"
+                android:backgroundTint="@color/appred"/>
+
+            <Button
+                android:id="@+id/btnDiastolicPlus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/pulseLabel"
+            android:text="Tętno"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/appred"
+            app:layout_constraintTop_toBottomOf="@id/diastolicLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/pulseLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@id/pulseLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:id="@+id/btnPulseMinus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/pulseEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="80"
+                android:inputType="number"
+                android:textColorHint="@color/appred"
+                android:textColor="@color/appred"
+                android:backgroundTint="@color/appred"/>
+
+            <Button
+                android:id="@+id/btnPulsePlus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/appred"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/noteEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/appred"
+            android:textColorHint="@color/appred"
+            android:backgroundTint="@color/appred"
+            android:hint="Dodaj notatkę (opcjonalnie)"
+            app:layout_constraintTop_toBottomOf="@id/pulseLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:id="@+id/btnCancelAddPressure"
+            android:text="Anuluj"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/appred"
+            android:textSize="14sp"
+            app:cornerRadius="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/noteEditText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnAddPressure"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:id="@+id/btnAddPressure"
+            android:text="Dodaj"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/appred"
+            android:textSize="14sp"
+            app:cornerRadius="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/noteEditText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnCancelAddPressure"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

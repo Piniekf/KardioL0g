@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,11 +60,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.party.kardiol0g.loginregister.LoginActivity;
 import com.party.kardiol0g.medicine.Medicine;
 import com.party.kardiol0g.medicine.MedicineFragment;
+import com.party.kardiol0g.preasure.Preasure;
 import com.party.kardiol0g.preasure.PreasureFragment;
 import com.party.kardiol0g.settings.SettingsActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -240,12 +245,108 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LinearLayout addFile = dialog[0].findViewById(R.id.addFile);
         LinearLayout doctorChat = dialog[0].findViewById(R.id.doctorChat);
         ImageView cancelButton = dialog[0].findViewById(R.id.cancelButton);
-
+        // Dodawanie ciśnienia
         addPressure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog[0].dismiss();
-                Toast.makeText(MainActivity.this,"Dodaj ciśnienie kliknięte",Toast.LENGTH_SHORT).show();
+                dialog[0].dismiss(); // Zamknięcie istniejącego dialogu, jeśli istnieje
+
+                // Pobranie bieżącego użytkownika
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if (currentUser == null) {
+                    // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat
+                    Toast.makeText(MainActivity.this, "Nie można dodać pomiaru. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Tworzenie okna dialogowego
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_pressure, null);
+                EditText systolicEditText = dialogView.findViewById(R.id.systolicEditText);
+                EditText diastolicEditText = dialogView.findViewById(R.id.diastolicEditText);
+                EditText heartRateEditText = dialogView.findViewById(R.id.pulseEditText);
+                EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
+                Button btnSave = dialogView.findViewById(R.id.btnAddPressure);
+
+                // Ustawienie bieżącej daty i godziny
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String currentDate = dateFormat.format(calendar.getTime());
+                String currentTime = timeFormat.format(calendar.getTime());
+
+                builder.setView(dialogView);
+                AlertDialog dialog = builder.create();
+
+                // Ustawienie obsługi zdarzenia dla przycisku zapisywania pomiaru ciśnienia
+                btnSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Pobranie danych z pól tekstowych
+                        String systolicString = systolicEditText.getText().toString();
+                        String diastolicString = diastolicEditText.getText().toString();
+                        String heartRateString = heartRateEditText.getText().toString();
+                        String note = noteEditText.getText().toString();
+
+                        // Sprawdzenie, czy pola są wypełnione
+                        if (TextUtils.isEmpty(systolicString) || TextUtils.isEmpty(diastolicString) || TextUtils.isEmpty(heartRateString)) {
+                            Toast.makeText(MainActivity.this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Konwersja wartości na liczby całkowite
+                        int systolic = Integer.parseInt(systolicString);
+                        int diastolic = Integer.parseInt(diastolicString);
+                        int heartRate = Integer.parseInt(heartRateString);
+
+                        // Utworzenie obiektu Preasure i ustawienie wartości
+                        Preasure pressure = new Preasure();
+                        pressure.setSystolic(systolic);
+                        pressure.setDiastolic(diastolic);
+                        pressure.setHeartrate(heartRate);
+                        pressure.setNote(note);
+                        pressure.setDate(currentDate);
+                        pressure.setTime(currentTime);
+
+                        // Dodanie pomiaru do bazy danych Firebase Realtime Database pod użytkownikiem
+                        DatabaseReference userPressureRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Pressures").push();
+                        userPressureRef.setValue(pressure)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        // Wyświetlenie komunikatu potwierdzającego dodanie pomiaru
+                                        Toast.makeText(MainActivity.this, "Dodano pomiar ciśnienia", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Wyświetlenie komunikatu o błędzie
+                                        Toast.makeText(MainActivity.this, "Błąd podczas dodawania pomiaru: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        // Zamknięcie dialogu
+                        dialog.dismiss();
+                    }
+                });
+
+                Button btnCancelAddPressure = dialogView.findViewById(R.id.btnCancelAddPressure);
+                btnCancelAddPressure.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Zamknięcie dialogu
+                        dialog.dismiss();
+                    }
+                });
+
+                    // Ustawienie tła dialogu na przezroczyste
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                }
+
+                // Wyświetlenie dialogu
+                dialog.show();
             }
         });
         // Dodawanie leku
@@ -452,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.show();
             }
         });
-
+        // Dodawanie pliku
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -460,6 +561,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this,"Dodaj plik kliknięte",Toast.LENGTH_SHORT).show();
             }
         });
+        // Czat z lekarzem, ale to nie wiem czy zdążę zrobić
         doctorChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
