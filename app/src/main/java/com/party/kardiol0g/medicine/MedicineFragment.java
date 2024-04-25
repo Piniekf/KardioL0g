@@ -1,12 +1,19 @@
 package com.party.kardiol0g.medicine;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -105,6 +112,7 @@ public class MedicineFragment extends Fragment {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Medicine medicine = snapshot.getValue(Medicine.class);
                         if (medicine != null) {
+                            medicine.setId(snapshot.getKey()); // Ustawienie ID leku
                             medicineList.add(medicine);
                         }
                     }
@@ -121,6 +129,138 @@ public class MedicineFragment extends Fragment {
 
     // Metoda do obsługi edycji lub usuwania leku
     private void editOrDeleteMedicine(Medicine medicine) {
-        // Tutaj dodaj kod do obsługi edycji lub usuwania leku
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Wybierz akcję")
+                .setMessage("Co chcesz zrobić z tym lekiem?")
+                .setPositiveButton("Edytuj", (dialog, which) -> editMedicine(medicine))
+                .setNegativeButton("Usuń", (dialog, which) -> deleteMedicine(medicine))
+                .setNeutralButton("Anuluj", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    // Metoda do edycji leku
+    private void editMedicine(Medicine medicine) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_medicine, null);
+
+        EditText medicineNameBox = dialogView.findViewById(R.id.medicineNameBox);
+        Spinner doseSpinner = dialogView.findViewById(R.id.doseSpinner);
+        EditText quantityEditText = dialogView.findViewById(R.id.quantityEditText);
+        CheckBox morningCheckBox = dialogView.findViewById(R.id.morningCheckBox);
+        CheckBox noonCheckBox = dialogView.findViewById(R.id.noonCheckBox);
+        CheckBox eveningCheckBox = dialogView.findViewById(R.id.eveningCheckBox);
+        EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
+
+        // Ustawienie wartości pól edycji na podstawie danych leku
+        medicineNameBox.setText(medicine.getName());
+        medicineNameBox.setEnabled(false); // Ustawienie pola nazwy leku jako nieedytowalne
+        doseSpinner.getSelectedItem(); // to jest do poprawny, na razie tak zostawiam bo nie wiem jak to zrobić
+        quantityEditText.setText(medicine.getQuantity());
+        morningCheckBox.setChecked(medicine.isMorning());
+        noonCheckBox.setChecked(medicine.isNoon());
+        eveningCheckBox.setChecked(medicine.isEvening());
+        noteEditText.setText(medicine.getNote());
+
+        builder.setView(dialogView);
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+
+        dialog.show();
+
+        // Ustawienie przezroczystego tła dla okna dialogowego
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialogView.findViewById(R.id.btnUpdateMedicine).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Pobierz zmienione wartości z pól edycji
+                String newName = medicineNameBox.getText().toString();
+                String newDose = doseSpinner.getSelectedItem().toString();
+                String newQuantity = quantityEditText.getText().toString();
+                boolean newMorning = morningCheckBox.isChecked();
+                boolean newNoon = noonCheckBox.isChecked();
+                boolean newEvening = eveningCheckBox.isChecked();
+                String newNote = noteEditText.getText().toString();
+
+                // Zaktualizuj dane leku w bazie danych Firebase
+                updateMedicine(medicine, newName, newDose, newQuantity, newMorning, newNoon, newEvening, newNote);
+
+                // Zamknij dialog
+                dialog.dismiss();
+            }
+        });
+
+        dialogView.findViewById(R.id.btnCancelEditMedicine).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Wywołaj metodę usuwania leku
+                deleteMedicine(medicine);
+
+                // Zamknij dialog
+                dialog.dismiss();
+            }
+        });
+
+        dialogView.findViewById(R.id.btnCancelEditMedicine).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Zamknij dialog
+                dialog.dismiss();
+            }
+        });
+    }
+
+
+
+
+    // Metoda do usuwania leku
+    private void deleteMedicine(Medicine medicine) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Users")
+                    .child(currentUser.getUid())
+                    .child("Medicines")
+                    .child(medicine.getId());
+
+            userMedicinesRef.removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(requireContext(), "Lek usunięty", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(requireContext(), "Błąd podczas usuwania leku", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    // Metoda do aktualizacji danych leku w bazie danych Firebase
+    private void updateMedicine(Medicine medicine, String newName, String newDose, String newQuantity, boolean newMorning, boolean newNoon, boolean newEvening, String newNote) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Users")
+                    .child(currentUser.getUid())
+                    .child("Medicines")
+                    .child(medicine.getId());
+
+            // Ustaw nowe wartości leku
+            medicine.setName(newName);
+            medicine.setDose(newDose);
+            medicine.setQuantity(newQuantity);
+            medicine.setMorning(newMorning);
+            medicine.setNoon(newNoon);
+            medicine.setEvening(newEvening);
+            medicine.setNote(newNote);
+
+            // Zaktualizuj dane leku w bazie danych
+            userMedicinesRef.setValue(medicine)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(requireContext(), "Lek zaktualizowany", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(requireContext(), "Błąd podczas aktualizacji leku", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 }

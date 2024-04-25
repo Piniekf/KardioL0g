@@ -1,4 +1,4 @@
-package com.party.kardiol0g;
+package com.party.kardiol0g.loginregister;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.party.kardiol0g.R;
+import com.party.kardiol0g.settings.InitialSettingsActivity;
 
 public class SignUpActivity extends AppCompatActivity {
 

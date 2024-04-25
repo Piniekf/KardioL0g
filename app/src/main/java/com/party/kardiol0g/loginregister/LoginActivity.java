@@ -1,4 +1,4 @@
-package com.party.kardiol0g;
+package com.party.kardiol0g.loginregister;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -32,6 +32,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.party.kardiol0g.MainActivity;
+import com.party.kardiol0g.R;
 
 public class LoginActivity extends AppCompatActivity {
 

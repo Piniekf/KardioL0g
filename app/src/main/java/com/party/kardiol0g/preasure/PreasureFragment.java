@@ -1,4 +1,4 @@
-package com.party.kardiol0g;
+package com.party.kardiol0g.preasure;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.party.kardiol0g.R;
 
 /**
  * A simple {@link Fragment} subclass.

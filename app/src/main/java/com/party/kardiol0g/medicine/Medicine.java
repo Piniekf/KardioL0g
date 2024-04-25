@@ -9,6 +9,7 @@ public class Medicine {
     private boolean noon;
     private boolean evening;
     private String note;
+    private String id;
 
     public String getName() {
         return name;
@@ -72,5 +73,13 @@ public class Medicine {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

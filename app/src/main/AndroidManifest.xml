@@ -36,13 +36,13 @@
             android:name=".QRCodeActivity"
             android:exported="false" />
         <activity
-            android:name=".InitialSettingsActivity"
+            android:name=".settings.InitialSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".loginregister.LoginActivity"
             android:exported="true" >
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
@@ -50,7 +50,7 @@
         </intent-filter>
         </activity>
         <activity
-            android:name=".SignUpActivity"
+            android:name=".loginregister.SignUpActivity"
             android:exported="false"/>
         <activity
             android:name=".MainActivity"
