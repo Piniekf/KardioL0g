@@ -368,39 +368,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         // Pobierz notatkę z EditText
                         String note = noteEditText.getText().toString();
 
-                        // Sprawdzamy, czy wybrany lek już istnieje w bazie danych użytkownika
+                        // Tworzymy obiekt Medicine
+                        Medicine medicine = new Medicine();
+                        medicine.setName(medicineName);
+                        medicine.setStrength(medicineStrength);
+                        medicine.setDose(dose);
+                        medicine.setQuantity(quantity);
+                        medicine.setMorning(isMorningChecked);
+                        medicine.setNoon(isNoonChecked);
+                        medicine.setEvening(isEveningChecked);
+                        medicine.setNote(note);
+
+                        // Sprawdź, czy wybrany lek już istnieje w bazie danych użytkownika
                         FirebaseUser currentUser = mAuth.getCurrentUser();
                         if (currentUser != null) {
                             DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Medicines");
+
+                            // Pobierz listę leków użytkownika z bazy danych
                             userMedicinesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    boolean isMedicineExists = false;
+                                    boolean medicineExists = false;
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         Medicine existingMedicine = snapshot.getValue(Medicine.class);
                                         if (existingMedicine != null && existingMedicine.getName().equals(medicineName) && existingMedicine.getStrength().equals(medicineStrength)) {
-                                            // Jeśli lek już istnieje w bazie danych użytkownika, ustaw flagę isMedicineExists na true i przerwij pętlę
-                                            isMedicineExists = true;
+                                            // Jeśli lek już istnieje w bazie danych, ustaw flagę na true
+                                            medicineExists = true;
                                             break;
                                         }
                                     }
-
-                                    if (isMedicineExists) {
-                                        // Wyświetl komunikat, że lek już istnieje w bazie danych użytkownika
-                                        Toast.makeText(MainActivity.this, "Ten lek już istnieje w Twojej liście", Toast.LENGTH_SHORT).show();
+                                    if (medicineExists) {
+                                        // Jeśli lek już istnieje, wyświetl odpowiedni komunikat
+                                        Toast.makeText(MainActivity.this, "Lek już istnieje w bazie danych", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        // Tworzymy obiekt Medicine
-                                        Medicine medicine = new Medicine();
-                                        medicine.setName(medicineName);
-                                        medicine.setStrength(medicineStrength);
-                                        medicine.setDose(dose);
-                                        medicine.setQuantity(quantity);
-                                        medicine.setMorning(isMorningChecked);
-                                        medicine.setNoon(isNoonChecked);
-                                        medicine.setEvening(isEveningChecked);
-                                        medicine.setNote(note);
-
-                                        // Dodajemy lek do bazy danych
+                                        // Jeśli lek nie istnieje, dodaj go do bazy danych
                                         String medicineId = userMedicinesRef.push().getKey();
                                         userMedicinesRef.child(medicineId).setValue(medicine)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -423,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                     // Obsługa błędu pobierania danych
-                                    Toast.makeText(MainActivity.this, "Błąd: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Błąd pobierania danych: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
@@ -435,7 +436,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         dialog.dismiss();
                     }
                 });
-
 
 
                 dialogView.findViewById(R.id.btnCancelAddMedicine).setOnClickListener(new View.OnClickListener() {
