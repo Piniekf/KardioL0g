@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -54,6 +56,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.party.kardiol0g.medicine.Medicine;
+import com.party.kardiol0g.medicine.MedicineFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -362,49 +366,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         // Pobierz notatkę z EditText
                         String note = noteEditText.getText().toString();
 
-                        // Sprawdzamy, czy wybrany lek już istnieje w bazie danych użytkownika
+                        // Tworzymy obiekt Medicine
+                        Medicine medicine = new Medicine();
+                        medicine.setName(medicineName);
+                        medicine.setStrength(medicineStrength);
+                        medicine.setDose(dose);
+                        medicine.setQuantity(quantity);
+                        medicine.setMorning(isMorningChecked);
+                        medicine.setNoon(isNoonChecked);
+                        medicine.setEvening(isEveningChecked);
+                        medicine.setNote(note);
+
+                        // Dodajemy lek do bazy danych
                         FirebaseUser currentUser = mAuth.getCurrentUser();
                         if (currentUser != null) {
                             DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Medicines");
-                            userMedicinesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    boolean isMedicineExists = false;
-                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                        Map<String, Object> medicineData = (Map<String, Object>) snapshot.getValue();
-                                        String existingMedicineName = (String) medicineData.get("name");
-                                        if (existingMedicineName != null && existingMedicineName.equals(medicineName)) {
-                                            // Jeśli lek już istnieje w bazie danych użytkownika, ustaw flagę isMedicineExists na true i przerwij pętlę
-                                            isMedicineExists = true;
-                                            break;
+                            String medicineId = userMedicinesRef.push().getKey();
+                            userMedicinesRef.child(medicineId).setValue(medicine)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Wyświetl komunikat potwierdzający dodanie leku
+                                            Toast.makeText(MainActivity.this, "Lek dodany pomyślnie", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
-
-                                    if (isMedicineExists) {
-                                        // Wyświetl komunikat, że lek już istnieje w bazie danych użytkownika
-                                        Toast.makeText(MainActivity.this, "Ten lek już istnieje w Twojej liście", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        // Dodaj nowy lek do bazy danych użytkownika wraz z innymi danymi
-                                        String medicineId = userMedicinesRef.push().getKey();
-                                        userMedicinesRef.child(medicineId).child("name").setValue(medicineName);
-                                        userMedicinesRef.child(medicineId).child("strength").setValue(medicineStrength);
-                                        userMedicinesRef.child(medicineId).child("dose").setValue(dose);
-                                        userMedicinesRef.child(medicineId).child("quantity").setValue(quantity);
-                                        userMedicinesRef.child(medicineId).child("morning").setValue(isMorningChecked);
-                                        userMedicinesRef.child(medicineId).child("noon").setValue(isNoonChecked);
-                                        userMedicinesRef.child(medicineId).child("evening").setValue(isEveningChecked);
-                                        userMedicinesRef.child(medicineId).child("note").setValue(note);
-                                        // Wyświetl komunikat potwierdzający dodanie leku
-                                        Toast.makeText(MainActivity.this, "Lek dodany pomyślnie", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    // Obsługa błędu pobierania danych
-                                    Toast.makeText(MainActivity.this, "Błąd: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Obsługa błędu dodawania leku
+                                            Toast.makeText(MainActivity.this, "Błąd podczas dodawania leku: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         } else {
                             // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat o błędzie
                             Toast.makeText(MainActivity.this, "Nie można dodać leku. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();

@@ -1,7 +1,6 @@
-package com.party.kardiol0g;
+package com.party.kardiol0g.medicine;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +19,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.party.kardiol0g.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 
 public class MedicineFragment extends Fragment {
 
-    private ListView listViewMedicines;
-    private List<String> medicineList;
-    private ArrayAdapter<String> adapter;
+    private List<Medicine> medicineList;
+    private ArrayAdapter<Medicine> adapter;
 
     public MedicineFragment() {
-        // Wymagany pusty konstruktor
+        // Required empty public constructor
     }
 
     public static MedicineFragment newInstance() {
@@ -43,11 +40,10 @@ public class MedicineFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_medicine, container, false);
-        listViewMedicines = view.findViewById(R.id.listViewMedicines);
+        ListView listViewMedicines = view.findViewById(R.id.listViewMedicines);
         medicineList = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(requireContext(), R.layout.list_item_medicine, R.id.textMedicineName, medicineList) {
+        adapter = new ArrayAdapter<Medicine>(requireContext(), R.layout.list_item_medicine, R.id.textMedicineName, medicineList) {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -65,18 +61,21 @@ public class MedicineFragment extends Fragment {
                 TextView noonTextView = listItemView.findViewById(R.id.textNoon);
                 TextView eveningTextView = listItemView.findViewById(R.id.textEvening);
 
-                String medicineInfo = getItem(position);
-                String[] medicineInfoArray = medicineInfo.split("\n");
-                Log.d("MedicineFragment", "Medicine Info Array: " + Arrays.toString(medicineInfoArray));
+                Medicine medicine = getItem(position);
 
-                medicineNameTextView.setText(medicineInfoArray[0]);
-                medicineDetailsTextView.setText(medicineInfoArray[1]);
-                medicineDoseTextView.setText(medicineInfoArray[2]);
-                medicineQuantityTextView.setText(medicineInfoArray[3]);
-                morningTextView.setText(medicineInfoArray[4].contains("Tak") ? "Rano: Tak |" : "Rano: Nie |");
-                noonTextView.setText(medicineInfoArray[5].contains("Tak") ? "Południe: Tak |" : "Południe: Nie |");
-                eveningTextView.setText(medicineInfoArray[6].contains("Tak") ? "Wieczór: Tak" : "Wieczór: Nie");
-                medicineNoteTextView.setText(medicineInfoArray[7]);
+                if (medicine != null) {
+                    medicineNameTextView.setText("Nazwa: " + medicine.getName());
+                    medicineDetailsTextView.setText("Moc: " + medicine.getStrength());
+                    medicineDoseTextView.setText("Dawka: " + medicine.getDose());
+                    medicineQuantityTextView.setText("Ilość: " + medicine.getQuantity());
+                    morningTextView.setText(medicine.isMorning() ? "Rano: Tak |" : "Rano: Nie |");
+                    noonTextView.setText(medicine.isNoon() ? "Południe: Tak |" : "Południe: Nie |");
+                    eveningTextView.setText(medicine.isEvening() ? "Wieczór: Tak" : "Wieczór: Nie");
+                    medicineNoteTextView.setText("Notatka: " + medicine.getNote());
+
+                    // Obsługa kliknięcia elementu na liście
+                    listItemView.setOnClickListener(v -> editOrDeleteMedicine(medicine));
+                }
 
                 return listItemView;
             }
@@ -104,28 +103,10 @@ public class MedicineFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     medicineList.clear();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String medicineName = snapshot.child("name").getValue(String.class);
-                        String medicineStrength = snapshot.child("strength").getValue(String.class);
-                        String dose = snapshot.child("dose").getValue(String.class);
-                        String quantity = snapshot.child("quantity").getValue(String.class);
-                        boolean morning = Boolean.TRUE.equals(snapshot.child("morning").getValue(Boolean.class));
-                        boolean noon = Boolean.TRUE.equals(snapshot.child("noon").getValue(Boolean.class));
-                        boolean evening = Boolean.TRUE.equals(snapshot.child("evening").getValue(Boolean.class));
-                        String note = snapshot.child("note").getValue(String.class);
-
-                        Log.d("MedicineFragment", "Morning: " + morning);
-                        Log.d("MedicineFragment", "Noon: " + noon);
-                        Log.d("MedicineFragment", "Evening: " + evening);
-
-                        String medicineInfo = "Nazwa: " + medicineName + "\n" +
-                                "Moc: " + medicineStrength + "\n" +
-                                "Dawka: " + dose + "\n" +
-                                "Ilość: " + quantity + "\n" +
-                                "Rano: " + (morning ? "Tak" : "Nie") + "\n" +
-                                "Południe: " + (noon ? "Tak" : "Nie") + "\n" +
-                                "Wieczór: " + (evening ? "Tak" : "Nie") + "\n" +
-                                "Notatka: " + note + "\n";
-                        medicineList.add(medicineInfo);
+                        Medicine medicine = snapshot.getValue(Medicine.class);
+                        if (medicine != null) {
+                            medicineList.add(medicine);
+                        }
                     }
                     adapter.notifyDataSetChanged();
                 }
@@ -138,4 +119,8 @@ public class MedicineFragment extends Fragment {
         }
     }
 
+    // Metoda do obsługi edycji lub usuwania leku
+    private void editOrDeleteMedicine(Medicine medicine) {
+        // Tutaj dodaj kod do obsługi edycji lub usuwania leku
+    }
 }
