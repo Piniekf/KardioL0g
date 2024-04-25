@@ -55,38 +55,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnSystolicMinus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_minus"
+                android:background="@drawable/circle_button_background"/>
 
             <EditText
                 android:id="@+id/systolicEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="120"
+                android:text="120"
                 android:inputType="number"
                 android:textColorHint="@color/appred"
                 android:textColor="@color/appred"
                 android:backgroundTint="@color/appred"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnSystolicPlus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_plus"
+                android:background="@drawable/circle_button_background"/>
 
         </LinearLayout>
 
@@ -116,40 +108,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnDiastolicMinus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_minus"
+                android:background="@drawable/circle_button_background"/>
 
             <EditText
                 android:id="@+id/diastolicEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="80"
+                android:text="80"
                 android:inputType="number"
                 android:textColorHint="@color/appred"
                 android:textColor="@color/appred"
                 android:backgroundTint="@color/appred"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnDiastolicPlus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_plus"
+                android:background="@drawable/circle_button_background"/>
 
         </LinearLayout>
+
 
         <TextView
             android:layout_width="match_parent"
@@ -177,40 +162,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnPulseMinus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_minus"
+                android:background="@drawable/circle_button_background"/>
 
             <EditText
                 android:id="@+id/pulseEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="80"
+                android:text="80"
                 android:inputType="number"
                 android:textColorHint="@color/appred"
                 android:textColor="@color/appred"
                 android:backgroundTint="@color/appred"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnPulsePlus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/appred"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_plus"
+                android:background="@drawable/circle_button_background"/>
 
         </LinearLayout>
+
 
         <EditText
             android:id="@+id/noteEditText"
@@ -227,16 +205,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+
         <Button
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:id="@+id/btnCancelAddPressure"
             android:text="Anuluj"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="10dp"
             android:textColor="@color/white"
             android:backgroundTint="@color/appred"
             android:textSize="14sp"
             app:cornerRadius="20dp"
-            android:layout_marginStart="40dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/noteEditText"
@@ -252,6 +232,7 @@
             android:backgroundTint="@color/appred"
             android:textSize="14sp"
             app:cornerRadius="20dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="40dp"
             app:layout_constraintEnd_toEndOf="parent"

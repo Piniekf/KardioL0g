@@ -1,12 +1,13 @@
 package com.party.kardiol0g.preasure;
 
-public class Preasure {
+public class Pressure {
     private int systolic;
     private int diastolic;
     private int heartrate;
     private String note;
     private String date;
     private String time;
+    private String id;
 
     public String getNote() {
         return note;
@@ -54,5 +55,13 @@ public class Preasure {
 
     public String getTime() {
         return time;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

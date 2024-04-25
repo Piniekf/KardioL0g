@@ -36,6 +36,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -60,8 +61,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.party.kardiol0g.loginregister.LoginActivity;
 import com.party.kardiol0g.medicine.Medicine;
 import com.party.kardiol0g.medicine.MedicineFragment;
-import com.party.kardiol0g.preasure.Preasure;
-import com.party.kardiol0g.preasure.PreasureFragment;
+import com.party.kardiol0g.preasure.Pressure;
+import com.party.kardiol0g.preasure.PressureFragment;
 import com.party.kardiol0g.settings.SettingsActivity;
 
 import java.text.SimpleDateFormat;
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     replaceFragment(new FilesFragment());
                     break;
                 case R.id.bloodpreasure:
-                    replaceFragment(new PreasureFragment());
+                    replaceFragment(new PressureFragment());
                     break;
                 case R.id.more:
                     replaceFragment(new MoreFragment());
@@ -278,7 +279,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 builder.setView(dialogView);
                 AlertDialog dialog = builder.create();
 
-                // Ustawienie obsługi zdarzenia dla przycisku zapisywania pomiaru ciśnienia
+                // Obsługa przycisków do zmniejszania i zwiększania wartości ciśnienia oraz tętna
+                ImageButton btnSystolicMinus = dialogView.findViewById(R.id.btnSystolicMinus);
+                ImageButton btnSystolicPlus = dialogView.findViewById(R.id.btnSystolicPlus);
+                ImageButton btnDiastolicMinus = dialogView.findViewById(R.id.btnDiastolicMinus);
+                ImageButton btnDiastolicPlus = dialogView.findViewById(R.id.btnDiastolicPlus);
+                ImageButton btnPulseMinus = dialogView.findViewById(R.id.btnPulseMinus);
+                ImageButton btnPulsePlus = dialogView.findViewById(R.id.btnPulsePlus);
+
+                // Obsługa przycisku btnSystolicMinus
+                btnSystolicMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
+                        if (currentSystolic > 0) {
+                            systolicEditText.setText(String.valueOf(currentSystolic - 1));
+                        }
+                    }
+                });
+
+                // Obsługa przycisku btnSystolicPlus
+                btnSystolicPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
+                        systolicEditText.setText(String.valueOf(currentSystolic + 1));
+                    }
+                });
+
+                // Obsługa przycisku btnDiastolicMinus
+                btnDiastolicMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
+                        if (currentDiastolic > 0) {
+                            diastolicEditText.setText(String.valueOf(currentDiastolic - 1));
+                        }
+                    }
+                });
+
+                // Obsługa przycisku btnDiastolicPlus
+                btnDiastolicPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
+                        diastolicEditText.setText(String.valueOf(currentDiastolic + 1));
+                    }
+                });
+
+                // Obsługa przycisku btnPulseMinus
+                btnPulseMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
+                        if (currentPulse > 0) {
+                            heartRateEditText.setText(String.valueOf(currentPulse - 1));
+                        }
+                    }
+                });
+
+                // Obsługa przycisku btnPulsePlus
+                btnPulsePlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
+                        heartRateEditText.setText(String.valueOf(currentPulse + 1));
+                    }
+                });
+
+                // Obsługa przycisku btnSave
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -300,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         int heartRate = Integer.parseInt(heartRateString);
 
                         // Utworzenie obiektu Preasure i ustawienie wartości
-                        Preasure pressure = new Preasure();
+                        Pressure pressure = new Pressure();
                         pressure.setSystolic(systolic);
                         pressure.setDiastolic(diastolic);
                         pressure.setHeartrate(heartRate);
@@ -340,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-                    // Ustawienie tła dialogu na przezroczyste
+                // Ustawienie tła dialogu na przezroczyste
                 if (dialog.getWindow() != null) {
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 }
