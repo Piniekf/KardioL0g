@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.party.kardiol0g.NotificationHelper;
 
 
 public class FallDetectionService extends Service implements SensorEventListener {
@@ -69,13 +70,21 @@ public class FallDetectionService extends Service implements SensorEventListener
                 Log.e("FallDetectionService", "Błąd podczas pobierania numeru telefonu z Firebase: " + databaseError.getMessage());
             }
         });
+
+        // Pokaż powiadomienie
+        NotificationHelper.createNotificationChannel(this, "fall_detection_channel", "Fall Detection Service");
+        NotificationHelper.showNotification(this, "fall_detection_channel", 1, "Czujnik upadku", "Czujnik wykrycia upadku jest włączony.");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         sensorManager.unregisterListener(this);
+
+        // Ukryj powiadomienie
+        NotificationHelper.cancelNotification(this, 1);
     }
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {

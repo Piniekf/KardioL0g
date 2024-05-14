@@ -61,15 +61,15 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/criticalInfoTextView"
+                android:id="@+id/notificationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:text="Wysyłanie informacji krytycznej"
+                android:text="Pozwolenie na powiadomienia"
                 android:layout_centerVertical="true"/>
 
             <CheckBox
-                android:id="@+id/checkBoxCriticalInfo"
+                android:id="@+id/notificationCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
