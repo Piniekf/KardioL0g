@@ -1,28 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".preasure.PressureFragment">
+    android:layout_height="match_parent">
 
-    <!-- Nagłówek -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ciśnienia"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:textColor="@color/appred"
-        android:padding="16dp"/>
-
-    <!-- ListView do wyświetlania pomiarów ciśnienia -->
     <ListView
         android:id="@+id/pressureListView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
         android:divider="@android:color/transparent"
+        android:layout_marginBottom="60dp"
         android:dividerHeight="8dp"/>
-
-</LinearLayout>
+</RelativeLayout>

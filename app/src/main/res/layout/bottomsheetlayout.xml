@@ -59,7 +59,7 @@
             android:text="Dodaj pomiar ciśnienia"
             android:textColor="@color/appred"
             android:layout_marginLeft="30dp"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
     </LinearLayout>
 
@@ -82,7 +82,7 @@
             android:text="Dodaj lek"
             android:textColor="@color/appred"
             android:layout_marginLeft="30dp"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
     </LinearLayout>
 
@@ -105,7 +105,7 @@
             android:text="Dodaj dokument"
             android:textColor="@color/appred"
             android:layout_marginLeft="30dp"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
     </LinearLayout>
 
@@ -131,7 +131,7 @@
             android:text="Napisz do lekarza"
             android:textColor="@color/appred"
             android:layout_marginLeft="30dp"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
     </LinearLayout>
 

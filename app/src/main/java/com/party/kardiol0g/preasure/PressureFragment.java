@@ -33,13 +33,12 @@ public class PressureFragment extends Fragment {
     private List<Pressure> pressureList;
 
     public PressureFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_pressure, container, false);
     }
 
@@ -50,30 +49,38 @@ public class PressureFragment extends Fragment {
         pressureListView = view.findViewById(R.id.pressureListView);
         pressureList = new ArrayList<>();
 
-        preasureAdapter = new ArrayAdapter<Pressure>(getContext(), android.R.layout.simple_list_item_1, pressureList) {
+        preasureAdapter = new ArrayAdapter<Pressure>(getContext(), R.layout.item_pressure, pressureList) {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View itemView = super.getView(position, convertView, parent);
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_pressure, parent, false);
+                }
                 Pressure pressure = pressureList.get(position);
 
-                // Ustawienie tekstu dla pojedynczego elementu listy
-                TextView textView = itemView.findViewById(android.R.id.text1);
-                textView.setText("Skurczowe: " + pressure.getSystolic() + ", Rozkurczowe: " + pressure.getDiastolic() +
-                        ", Tętno: " + pressure.getHeartrate() +
-                        ", Data pomiaru: " + pressure.getDate() + ", Godzina pomiaru: " + pressure.getTime());
-                return itemView;
+                TextView textDayOfWeek = convertView.findViewById(R.id.textDayOfWeek);
+                TextView textDate = convertView.findViewById(R.id.textDate);
+                TextView textTime = convertView.findViewById(R.id.textTime);
+                TextView textSystolic = convertView.findViewById(R.id.textSystolic);
+                TextView textDiastolic = convertView.findViewById(R.id.textDiastolic);
+                TextView textHeartrate = convertView.findViewById(R.id.textHeartrate);
+
+                textDayOfWeek.setText(pressure.getDayOfWeek());
+                textDate.setText("Data: " + pressure.getDate());
+                textTime.setText("Godzina: " + pressure.getTime());
+                textSystolic.setText("Ciśnienie skurczowe: " + pressure.getSystolic());
+                textDiastolic.setText("Ciśnienie rozkurczowe: " + pressure.getDiastolic());
+                textHeartrate.setText("Tętno: " + pressure.getHeartrate());
+
+                return convertView;
             }
         };
 
         pressureListView.setAdapter(preasureAdapter);
         loadPressureData();
 
-        // Dodanie obsługi kliknięcia na element listy
         pressureListView.setOnItemClickListener((adapterView, view1, position, id) -> {
-            // Pobranie wybranego pomiaru ciśnienia
             Pressure selectedPressure = pressureList.get(position);
-            // Wywołanie metody wyświetlającej okno dialogowe z pytaniem o usunięcie pomiaru ciśnienia
             showDeletePressureDialog(selectedPressure);
         });
     }
@@ -93,7 +100,7 @@ public class PressureFragment extends Fragment {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Pressure pressure = snapshot.getValue(Pressure.class);
                         if (pressure != null) {
-                            pressure.setId(snapshot.getKey()); // Ustawienie ID pomiaru ciśnienia
+                            pressure.setId(snapshot.getKey());
                             pressureList.add(pressure);
                         }
                     }
@@ -102,13 +109,11 @@ public class PressureFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Obsługa błędu
                 }
             });
         }
     }
 
-    // Metoda do usuwania pomiaru ciśnienia
     private void deletePressure(Pressure pressure) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -127,16 +132,15 @@ public class PressureFragment extends Fragment {
                     });
         }
     }
+
     private void showDeletePressureDialog(Pressure pressure) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Usuń pomiar ciśnienia")
                 .setMessage("Czy na pewno chcesz usunąć ten pomiar ciśnienia?")
                 .setPositiveButton("Tak", (dialog, which) -> {
-                    // Jeśli użytkownik potwierdzi usunięcie, wywołujemy metodę usuwającą pomiar ciśnienia
                     deletePressure(pressure);
                 })
                 .setNegativeButton("Nie", (dialog, which) -> {
-                    // Jeśli użytkownik anuluje usunięcie, zamykamy okno dialogowe
                     dialog.dismiss();
                 })
                 .show();

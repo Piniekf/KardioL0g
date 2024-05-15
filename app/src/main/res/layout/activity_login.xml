@@ -79,7 +79,7 @@
           android:padding="8dp"
           android:text="Zapomniałeś hasła?"
           android:textColor="@color/appred"
-          android:textSize="16sp" />
+          android:textSize="14sp" />
 
       <com.developer.gbuttons.GoogleSignInButton
           android:layout_width="match_parent"

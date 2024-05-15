@@ -12,7 +12,7 @@
         android:text="Pokaż kod lekarzowi do zeskanowania"
         android:layout_above="@id/qrCodeImageView"
         android:layout_centerHorizontal="true"
-        android:textSize="16sp"/>
+        android:textSize="14sp"/>
 
     <ImageView
         android:id="@+id/qrCodeImageView"

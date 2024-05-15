@@ -1,5 +1,10 @@
 package com.party.kardiol0g.preasure;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class Pressure {
     private int systolic;
     private int diastolic;
@@ -63,5 +68,25 @@ public class Pressure {
 
     public String getId() {
         return id;
+    }
+    public String getDayOfWeek() {
+        try {
+            // Tworzymy obiekt kalendarza
+            Calendar calendar = Calendar.getInstance();
+
+            // Parsujemy datę pomiaru
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            calendar.setTime(dateFormat.parse(date));
+
+            // Pobieramy numer dnia tygodnia (0 - niedziela, 1 - poniedziałek, ..., 6 - sobota)
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+            // Mapujemy numer dnia tygodnia na jego nazwę
+            String[] dayNames = {"Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"};
+            return dayNames[dayOfWeek - 1];
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
