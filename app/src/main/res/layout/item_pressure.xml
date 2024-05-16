@@ -52,4 +52,12 @@
         android:textSize="14sp"
         
         android:layout_marginTop="2dp"/>
+
+    <TextView
+        android:id="@+id/textNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+
+        android:layout_marginTop="2dp"/>
 </LinearLayout>

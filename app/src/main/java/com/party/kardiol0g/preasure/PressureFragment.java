@@ -64,6 +64,7 @@ public class PressureFragment extends Fragment {
                 TextView textSystolic = convertView.findViewById(R.id.textSystolic);
                 TextView textDiastolic = convertView.findViewById(R.id.textDiastolic);
                 TextView textHeartrate = convertView.findViewById(R.id.textHeartrate);
+                TextView textNote = convertView.findViewById(R.id.textNote);
 
                 textDayOfWeek.setText(pressure.getDayOfWeek());
                 textDate.setText("Data: " + pressure.getDate());
@@ -71,6 +72,7 @@ public class PressureFragment extends Fragment {
                 textSystolic.setText("Ciśnienie skurczowe: " + pressure.getSystolic());
                 textDiastolic.setText("Ciśnienie rozkurczowe: " + pressure.getDiastolic());
                 textHeartrate.setText("Tętno: " + pressure.getHeartrate());
+                textNote.setText("Notatka: " + pressure.getNote());
 
                 return convertView;
             }

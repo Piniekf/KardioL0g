@@ -7,4 +7,9 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">This is an app widget description</string>
+    <string-array name="file_types">
+        <item>Wyniki krwi</item>
+        <item>EKG</item>
+        <item>Inne</item>
+    </string-array>
 </resources>

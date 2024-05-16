@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -69,6 +70,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.party.kardiol0g.files.FileData;
 import com.party.kardiol0g.files.FilesFragment;
 import com.party.kardiol0g.loginregister.LoginActivity;
 import com.party.kardiol0g.medicine.Medicine;
@@ -94,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences sharedPreferences;
     boolean nightMode;
     InterstitialAd mInterstitialAd;
+    private Uri selectedFileUri;
+    private static final int PICK_FILE_REQUEST_CODE = 1;
 
     private void loadInterstitialAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -235,12 +242,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                         @Override
                         public void onAdDismissedFullScreenContent() {
-                            // Called when fullscreen content is dismissed.
                             loadInterstitialAd(); // Ponowne ładowanie reklamy po jej zamknięciu
                         }
                     });
                 } else {
-                    Log.d("TAG", "The interstitial ad wasn't ready yet.");
+                    Log.d("TAG", "Reklama nie jest gotowa.");
                 }
                 showBottomDialog();
             }
@@ -694,11 +700,99 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         // Dodawanie pliku
+        // Dodawanie pliku
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog[0].dismiss();
-                Toast.makeText(MainActivity.this,"Dodaj plik kliknięte",Toast.LENGTH_SHORT).show();
+
+                // Pobranie bieżącego użytkownika
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if (currentUser == null) {
+                    Toast.makeText(MainActivity.this, "Nie można dodać pliku. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Tworzenie okna dialogowego
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_file, null);
+                EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
+                Spinner fileTypeSpinner = dialogView.findViewById(R.id.fileTypeSpinner);
+                Button btnSelectFile = dialogView.findViewById(R.id.btnSelectFile);
+                Button btnSaveFile = dialogView.findViewById(R.id.btnSaveFile);
+
+                builder.setView(dialogView);
+                AlertDialog fileDialog = builder.create();
+
+                // Obsługa przycisku wyboru pliku
+                btnSelectFile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("*/*");
+                        startActivityForResult(Intent.createChooser(intent, "Wybierz plik"), 1);
+                    }
+                });
+
+                // Obsługa przycisku zapisu pliku
+                btnSaveFile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String note = noteEditText.getText().toString();
+                        String fileType = fileTypeSpinner.getSelectedItem().toString();
+
+                        // Zapisywanie pliku do Firebase Storage
+                        if (selectedFileUri != null) {
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Files").child(selectedFileUri.getLastPathSegment());
+                            storageReference.putFile(selectedFileUri)
+                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                @Override
+                                                public void onSuccess(Uri uri) {
+                                                    String fileUrl = uri.toString();
+
+                                                    // Tworzenie obiektu FileData
+                                                    FileData fileData = new FileData(fileUrl, note, fileType);
+
+                                                    // Dodanie metadanych do bazy danych Firebase Realtime Database pod użytkownikiem
+                                                    DatabaseReference userFilesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Files").push();
+                                                    userFilesRef.setValue(fileData)
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    Toast.makeText(MainActivity.this, "Dodano plik", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            })
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Toast.makeText(MainActivity.this, "Błąd podczas dodawania pliku: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            });
+                                                }
+                                            });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(MainActivity.this, "Błąd podczas przesyłania pliku: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(MainActivity.this, "Nie wybrano pliku", Toast.LENGTH_SHORT).show();
+                        }
+
+                        fileDialog.dismiss();
+                    }
+                });
+
+                if (fileDialog.getWindow() != null) {
+                    fileDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                }
+                fileDialog.show();
             }
         });
         // Czat z lekarzem, ale to nie wiem czy zdążę zrobić
@@ -723,4 +817,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dialog[0].getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog[0].getWindow().setGravity(Gravity.BOTTOM);
     }
+
+
 }
