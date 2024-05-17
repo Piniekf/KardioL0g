@@ -3,6 +3,7 @@ package com.party.kardiol0g;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -100,7 +101,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     boolean nightMode;
     InterstitialAd mInterstitialAd;
     private Uri selectedFileUri;
-    private static final int PICK_FILE_REQUEST_CODE = 1;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            selectedFileUri = data.getData();
+            // Tutaj możesz wykonać dodatkowe operacje związane z wybranym plikiem, jeśli są wymagane
+        }
+    }
 
     private void loadInterstitialAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -729,8 +739,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.setType("*/*");
-                        startActivityForResult(Intent.createChooser(intent, "Wybierz plik"), 1);
+                        intent.setType("application/pdf"); // Tylko pliki PDF
+                        startActivityForResult(Intent.createChooser(intent, "Wybierz plik PDF"), 1);
                     }
                 });
 
