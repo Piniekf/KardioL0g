@@ -710,7 +710,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         // Dodawanie pliku
-        // Dodawanie pliku
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
