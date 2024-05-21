@@ -1,11 +1,15 @@
 package com.party.kardiol0g.files;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,11 +20,11 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.party.kardiol0g.R;
@@ -76,7 +80,7 @@ public class FilesFragment extends Fragment {
         builder.setTitle("Wybierz akcję")
                 .setMessage("Co chcesz zrobić z tym plikiem?")
                 .setPositiveButton("Otwórz plik", (dialog, which) -> {
-                    // Dodaj kod do otwierania pliku
+                    openPDFFile(fileData);
                     dialog.dismiss();
                 })
                 .setNegativeButton("Usuń", (dialog, which) -> {
@@ -86,6 +90,7 @@ public class FilesFragment extends Fragment {
                 .setNeutralButton("Anuluj", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
 
     private void deleteFile(FileData fileData) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -128,6 +133,7 @@ public class FilesFragment extends Fragment {
         super.onStart();
         if (adapter != null) {
             adapter.startListening();
+            recyclerView.setAdapter(adapter);
         }
     }
 
@@ -136,8 +142,10 @@ public class FilesFragment extends Fragment {
         super.onStop();
         if (adapter != null) {
             adapter.stopListening();
+            recyclerView.setAdapter(null);
         }
     }
+
 
     public static class FileViewHolder extends RecyclerView.ViewHolder {
         private TextView fileTypeTextView;
@@ -157,4 +165,20 @@ public class FilesFragment extends Fragment {
             noteTextView.setText("Notatka: " + fileData.getNote());
         }
     }
+    private void openPDFFile(FileData fileData) {
+        // Tworzymy Intencję
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        // Określamy typ pliku jako PDF
+        intent.setDataAndType(Uri.parse(fileData.getUrl()), "application/pdf");
+        // Dodajemy flagę do zabezpieczenia przed jakimkolwiek błędem
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        try {
+            // Sprawdzamy, czy jest aplikacja zdolna do obsługi plików PDF
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Jeśli nie ma aplikacji do obsługi plików PDF, wyświetlamy odpowiedni komunikat
+            Toast.makeText(requireContext(), "Nie znaleziono aplikacji do otwarcia plików PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
