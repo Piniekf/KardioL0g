@@ -3,14 +3,6 @@ package com.party.kardiol0g.files;
 public class FileData {
     private String fileName;
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     private String url;
     private String note;
     private String fileType;
@@ -50,4 +42,13 @@ public class FileData {
     public void setFileType(String fileType) {
         this.fileType = fileType;
     }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
 }
