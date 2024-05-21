@@ -28,6 +28,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +49,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -729,9 +731,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Spinner fileTypeSpinner = dialogView.findViewById(R.id.fileTypeSpinner);
                 Button btnSelectFile = dialogView.findViewById(R.id.btnSelectFile);
                 Button btnSaveFile = dialogView.findViewById(R.id.btnSaveFile);
+                Button btnSelectDate = dialogView.findViewById(R.id.btnSelectDate);
 
                 builder.setView(dialogView);
                 AlertDialog fileDialog = builder.create();
+
+                // Zmienna do przechowywania wybranej daty
+                final String[] selectedDate = {""};
+
+                // Obsługa wyboru daty
+                btnSelectDate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Calendar calendar = Calendar.getInstance();
+                        int year = calendar.get(Calendar.YEAR);
+                        int month = calendar.get(Calendar.MONTH);
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                selectedDate[0] = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                                btnSelectDate.setText(selectedDate[0]);
+                            }
+                        }, year, month, day);
+                        datePickerDialog.show();
+                    }
+                });
 
                 // Obsługa przycisku wyboru pliku
                 btnSelectFile.setOnClickListener(new View.OnClickListener() {
@@ -752,7 +778,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         // Zapisywanie pliku do Firebase Storage
                         if (selectedFileUri != null) {
-                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Files").child(selectedFileUri.getLastPathSegment());
+                            if (selectedDate[0].isEmpty()) {
+                                Toast.makeText(MainActivity.this, "Wybierz datę przed zapisem pliku", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            String fileName = fileType + "_" + selectedDate[0] + ".pdf";
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Files").child(fileName);
                             storageReference.putFile(selectedFileUri)
                                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
@@ -763,7 +794,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     String fileUrl = uri.toString();
 
                                                     // Tworzenie obiektu FileData
-                                                    FileData fileData = new FileData(fileUrl, note, fileType);
+                                                    FileData fileData = new FileData(fileUrl, note, fileType, fileName);
 
                                                     // Dodanie metadanych do bazy danych Firebase Realtime Database pod użytkownikiem
                                                     DatabaseReference userFilesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Files").push();
@@ -794,6 +825,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Toast.makeText(MainActivity.this, "Nie wybrano pliku", Toast.LENGTH_SHORT).show();
                         }
 
+
                         fileDialog.dismiss();
                     }
                 });
@@ -804,6 +836,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fileDialog.show();
             }
         });
+
         // Czat z lekarzem, ale to nie wiem czy zdążę zrobić
         doctorChat.setOnClickListener(new View.OnClickListener() {
             @Override

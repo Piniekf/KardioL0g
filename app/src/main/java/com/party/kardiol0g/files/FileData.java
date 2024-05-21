@@ -1,18 +1,30 @@
 package com.party.kardiol0g.files;
 
 public class FileData {
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     private String url;
     private String note;
     private String fileType;
+
 
     public FileData() {
         // Konieczny pusty konstruktor dla Firebase
     }
 
-    public FileData(String url, String note, String fileType) {
+    public FileData(String url, String note, String fileType, String fileName) {
         this.url = url;
         this.note = note;
         this.fileType = fileType;
+        this.fileName = fileName;
     }
 
     public String getUrl() {

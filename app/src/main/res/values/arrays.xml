@@ -6,4 +6,8 @@
         <item>tabletka</item>
         <item>kropla</item>
     </string-array>
+    <string-array name="file_types">
+        <item>Wyniki krwi</item>
+        <item>Inne</item>
+    </string-array>
 </resources>
