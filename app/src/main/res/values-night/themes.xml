@@ -14,10 +14,16 @@
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="dialogBoxBackground">@drawable/black_box</item>
+        <item name="bottomSheetDialogTheme">@drawable/dialogbkg_black</item>
     </style>
     <!-- Base application theme. -->
     <style name="Base.Theme.KardioL0g" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
 
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Atrybuty motywu -->
+        <item name="dialogBoxBackground">@drawable/black_box</item>
     </style>
 
     <style name="DialogAnimation">
