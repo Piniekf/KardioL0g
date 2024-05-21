@@ -113,7 +113,7 @@ public class FilesFragment extends Fragment {
                     .child("Users")
                     .child(currentUser.getUid())
                     .child("Files")
-                    .child(fileData.getFileName()); // Założenie, że fileName jest unikalne i jest nazwą pliku w Storage
+                    .child(fileData.getFileName());
             storageRef.delete().addOnSuccessListener(aVoid -> {
                 // Plik usunięty pomyślnie z Storage
             }).addOnFailureListener(exception -> {
