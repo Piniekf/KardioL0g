@@ -1,17 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- res/layout/fragment_home.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
     tools:context=".HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/tvDashboardTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
         android:text="Pulpit"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:textColor="@color/appred"/>
+        android:textSize="24sp"
+        android:textStyle="bold"/>
 
-</FrameLayout>
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/pressureChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/tvDashboardTitle"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/medicineChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/pressureChart"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+</RelativeLayout>

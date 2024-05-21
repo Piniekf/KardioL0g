@@ -2,16 +2,13 @@
     <!-- Base application theme. -->
     <style name="Theme.KardioL0g" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/appred</item>
+        <item name="colorPrimaryVariant">@color/appred</item>
         <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="dialogBoxBackground">@drawable/black_box</item>
@@ -19,12 +16,6 @@
     </style>
     <!-- Base application theme. -->
     <style name="Base.Theme.KardioL0g" parent="Theme.Material3.DayNight.NoActionBar"></style>
-
-    <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Atrybuty motywu -->
-        <item name="dialogBoxBackground">@drawable/black_box</item>
-    </style>
-
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
