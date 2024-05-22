@@ -76,27 +76,41 @@ public class HomeFragment extends Fragment {
         databaseReference.child("Pressures").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Entry> systolicEntries = new ArrayList<>();
-                List<Entry> diastolicEntries = new ArrayList<>();
-                List<String> dates = new ArrayList<>(); // Lista przechowująca daty
+                List<Pressure> pressures = new ArrayList<>();
 
-                // Ograniczenie do 7 wpisów
-                int counter = 0;
-
+                // Pobierz wszystkie wpisy ciśnienia z Firebase
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if (counter >= 7) break; // Ograniczenie do 7 wpisów
-
                     Pressure pressure = snapshot.getValue(Pressure.class);
                     if (pressure != null) {
-                        // Formatuj datę tak, aby zawierała tylko miesiąc i dzień
-                        String formattedDate = formatToMonthDay(pressure.getDate());
-                        // Dodaj sformatowaną datę do listy
-                        dates.add(formattedDate);
-                        systolicEntries.add(new Entry(counter, (float) pressure.getSystolic()));
-                        diastolicEntries.add(new Entry(counter, (float) pressure.getDiastolic()));
-
-                        counter++;
+                        pressures.add(pressure);
                     }
+                }
+
+                // Posortuj listę po dacie w porządku malejącym
+                pressures.sort((p1, p2) -> {
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        return dateFormat.parse(p2.getDate()).compareTo(dateFormat.parse(p1.getDate()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        return 0;
+                    }
+                });
+
+                // Ograniczenie do 7 najnowszych wpisów
+                pressures = pressures.subList(0, Math.min(7, pressures.size()));
+
+                List<Entry> systolicEntries = new ArrayList<>();
+                List<Entry> diastolicEntries = new ArrayList<>();
+                List<String> dates = new ArrayList<>();
+
+                for (int i = pressures.size() - 1; i >= 0; i--) {
+                    Pressure pressure = pressures.get(i);
+                    // Formatuj datę tak, aby zawierała tylko miesiąc i dzień
+                    String formattedDate = formatToMonthDay(pressure.getDate());
+                    dates.add(formattedDate);
+                    systolicEntries.add(new Entry(pressures.size() - 1 - i, (float) pressure.getSystolic()));
+                    diastolicEntries.add(new Entry(pressures.size() - 1 - i, (float) pressure.getDiastolic()));
                 }
 
                 LineDataSet systolicDataSet = new LineDataSet(systolicEntries, "Skurczowe (mmHg)");
@@ -106,7 +120,6 @@ public class HomeFragment extends Fragment {
                 diastolicDataSet.setColor(ColorTemplate.COLORFUL_COLORS[1]);
                 diastolicDataSet.setValueTextSize(12f);
 
-                // Ustawienia kolorów napisów dla LineDataSet
                 systolicDataSet.setValueTextColor(Color.GRAY);
                 diastolicDataSet.setValueTextColor(Color.GRAY);
 
