@@ -24,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.party.kardiol0g.R;
 
+import java.util.Objects;
+
 public class EmergencyButton extends AppWidgetProvider {
 
     private static final String ACTION_SEND_SMS = "com.party.kardiol0g.widgets.ACTION_SEND_SMS";
@@ -73,7 +75,7 @@ public class EmergencyButton extends AppWidgetProvider {
     }
 
     private static void fetchUserData(Context context, boolean shouldSendSMSAfter) {
-        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(currentUserUid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -107,16 +109,12 @@ public class EmergencyButton extends AppWidgetProvider {
         }
         locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
             @Override
-            public void onLocationChanged(Location location) {
-                if (location != null) {
+            public void onLocationChanged(@NonNull Location location) {
+                {
                     String mapUrl = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(contactPhoneNumber, null, userName + " potrzebuje pomocy! Lokalizacja: " + mapUrl, null, null);
                     Log.d("EmergencyButton", "SMS wysłany na numer: " + contactPhoneNumber + " z linkiem do mapy: " + mapUrl);
-                } else {
-                    Log.w("EmergencyButton", "Nie udało się pobrać aktualnej lokalizacji");
-                    SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(contactPhoneNumber, null, userName + " potrzebuje pomocy!", null, null);
                 }
             }
 
@@ -124,10 +122,10 @@ public class EmergencyButton extends AppWidgetProvider {
             public void onStatusChanged(String provider, int status, android.os.Bundle extras) {}
 
             @Override
-            public void onProviderEnabled(String provider) {}
+            public void onProviderEnabled(@NonNull String provider) {}
 
             @Override
-            public void onProviderDisabled(String provider) {}
+            public void onProviderDisabled(@NonNull String provider) {}
         }, null);
     }
 
