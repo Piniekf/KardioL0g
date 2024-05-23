@@ -1,18 +1,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center">
 
     <Button
         android:id="@+id/emergency_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send Emergency SMS" />
+        android:textColor="@color/white"
+        android:backgroundTint="@color/appred"
+        android:text="Wyślij SMS" />
 
     <TextView
         android:id="@+id/appwidget_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/appwidget_text" />
+        android:textColor="@color/white"
+        android:layout_gravity="center"
+        android:text="Pomocy!" />
 
 </LinearLayout>
