@@ -169,12 +169,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if (!isValidHeight(height)) {
-            Toast.makeText(SettingsActivity.this, "Niepoprawny wzrost (wartość liczbową)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SettingsActivity.this, "Niepoprawny wzrost (Podaj wartość liczbową)", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!isValidWeight(weight)) {
-            Toast.makeText(SettingsActivity.this, "Niepoprawna waga (wartość liczbową)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SettingsActivity.this, "Niepoprawna waga (Podaj wartość liczbową)", Toast.LENGTH_SHORT).show();
             return;
         }
 
