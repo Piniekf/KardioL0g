@@ -72,6 +72,7 @@ public class PDFViewerActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        finish();
         super.onDestroy();
     }
 }

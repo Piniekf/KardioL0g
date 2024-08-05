@@ -85,6 +85,15 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".MainActivity_Doctor"
+            android:exported="false" />
+        <activity
+            android:name=".PatientDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".files.PDFViewerActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

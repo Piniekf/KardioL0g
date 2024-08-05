@@ -1,13 +1,5 @@
 package com.party.kardiol0g.loginregister;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -18,6 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.developer.gbuttons.GoogleSignInButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,7 +32,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.party.kardiol0g.MainActivity;
+import com.party.kardiol0g.MainActivity_Doctor;
 import com.party.kardiol0g.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -187,9 +191,32 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        // Po pomyślnym zalogowaniu, zapamiętaj ten stan
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
+                        // Pobierz ID zalogowanego użytkownika
+                        String userId = auth.getCurrentUser().getUid();
+
+                        // Pobierz referencję do użytkownika w bazie danych
+                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
+
+                        // Odczytaj wartość czyLekarz
+                        userRef.child("czyLekarz").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    Boolean isDoctor = task.getResult().getValue(Boolean.class);
+                                    if (isDoctor != null && isDoctor) {
+                                        // Jeśli użytkownik jest lekarzem, przejdź do MainActivity_Doctor
+                                        startActivity(new Intent(LoginActivity.this, MainActivity_Doctor.class));
+                                    } else {
+                                        // Jeśli użytkownik nie jest lekarzem, przejdź do MainActivity
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    }
+                                    finish(); // Zakończ LoginActivity
+                                } else {
+                                    // Obsłuż błąd odczytu z bazy danych
+                                    Toast.makeText(LoginActivity.this, "Nie udało się pobrać danych użytkownika", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -198,4 +225,5 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }
