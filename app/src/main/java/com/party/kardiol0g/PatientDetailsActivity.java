@@ -44,8 +44,8 @@ public class PatientDetailsActivity extends AppCompatActivity {
         patientUid = getIntent().getStringExtra("patientUid");
         databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(patientUid);
 
-        loadPatientDetails();
         setupFileAdapter();
+        loadPatientDetails();
     }
 
     private void loadPatientDetails() {
@@ -104,6 +104,12 @@ public class PatientDetailsActivity extends AppCompatActivity {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file, parent, false);
                 return new FileDataViewHolder(view);
             }
+
+            @Override
+            public void onDataChanged() {
+                super.onDataChanged();
+                notifyDataSetChanged(); // Zapewnia, że adapter jest zsynchronizowany z danymi
+            }
         };
 
         recyclerViewFiles.setAdapter(fileAdapter);
@@ -144,6 +150,12 @@ public class PatientDetailsActivity extends AppCompatActivity {
         if (fileAdapter != null) {
             fileAdapter.stopListening();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPatientDetails();
     }
 
     public static class FileDataViewHolder extends RecyclerView.ViewHolder {
