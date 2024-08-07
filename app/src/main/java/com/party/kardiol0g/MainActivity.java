@@ -2,31 +2,6 @@ package com.party.kardiol0g;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -59,7 +34,29 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -71,6 +68,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -337,175 +336,175 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageView cancelButton = dialog[0].findViewById(R.id.cancelButton);
         // Dodawanie ciśnienia
         addPressure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog[0].dismiss(); // Zamknięcie istniejącego dialogu, jeśli istnieje
+                @Override
+                public void onClick(View v) {
+                    dialog[0].dismiss(); // Zamknięcie istniejącego dialogu, jeśli istnieje
 
-                // Pobranie bieżącego użytkownika
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if (currentUser == null) {
-                    // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat
-                    Toast.makeText(MainActivity.this, "Nie można dodać pomiaru. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
-                    return;
+                    // Pobranie bieżącego użytkownika
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    if (currentUser == null) {
+                        // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat
+                        Toast.makeText(MainActivity.this, "Nie można dodać pomiaru. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Tworzenie okna dialogowego
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_pressure, null);
+                    EditText systolicEditText = dialogView.findViewById(R.id.systolicEditText);
+                    EditText diastolicEditText = dialogView.findViewById(R.id.diastolicEditText);
+                    EditText heartRateEditText = dialogView.findViewById(R.id.pulseEditText);
+                    EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
+                    Button btnSave = dialogView.findViewById(R.id.btnAddPressure);
+
+                    // Ustawienie bieżącej daty i godziny
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    String currentDate = dateFormat.format(calendar.getTime());
+                    String currentTime = timeFormat.format(calendar.getTime());
+
+                    builder.setView(dialogView);
+                    AlertDialog dialog = builder.create();
+
+                    // Obsługa przycisków do zmniejszania i zwiększania wartości ciśnienia oraz tętna
+                    ImageButton btnSystolicMinus = dialogView.findViewById(R.id.btnSystolicMinus);
+                    ImageButton btnSystolicPlus = dialogView.findViewById(R.id.btnSystolicPlus);
+                    ImageButton btnDiastolicMinus = dialogView.findViewById(R.id.btnDiastolicMinus);
+                    ImageButton btnDiastolicPlus = dialogView.findViewById(R.id.btnDiastolicPlus);
+                    ImageButton btnPulseMinus = dialogView.findViewById(R.id.btnPulseMinus);
+                    ImageButton btnPulsePlus = dialogView.findViewById(R.id.btnPulsePlus);
+
+                    // Obsługa przycisku btnSystolicMinus
+                    btnSystolicMinus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
+                            if (currentSystolic > 0) {
+                                systolicEditText.setText(String.valueOf(currentSystolic - 1));
+                            }
+                        }
+                    });
+
+                    // Obsługa przycisku btnSystolicPlus
+                    btnSystolicPlus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
+                            systolicEditText.setText(String.valueOf(currentSystolic + 1));
+                        }
+                    });
+
+                    // Obsługa przycisku btnDiastolicMinus
+                    btnDiastolicMinus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
+                            if (currentDiastolic > 0) {
+                                diastolicEditText.setText(String.valueOf(currentDiastolic - 1));
+                            }
+                        }
+                    });
+
+                    // Obsługa przycisku btnDiastolicPlus
+                    btnDiastolicPlus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
+                            diastolicEditText.setText(String.valueOf(currentDiastolic + 1));
+                        }
+                    });
+
+                    // Obsługa przycisku btnPulseMinus
+                    btnPulseMinus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
+                            if (currentPulse > 0) {
+                                heartRateEditText.setText(String.valueOf(currentPulse - 1));
+                            }
+                        }
+                    });
+
+                    // Obsługa przycisku btnPulsePlus
+                    btnPulsePlus.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
+                            heartRateEditText.setText(String.valueOf(currentPulse + 1));
+                        }
+                    });
+
+                    // Obsługa przycisku btnSave
+                    btnSave.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Pobranie danych z pól tekstowych
+                            String systolicString = systolicEditText.getText().toString();
+                            String diastolicString = diastolicEditText.getText().toString();
+                            String heartRateString = heartRateEditText.getText().toString();
+                            String note = noteEditText.getText().toString();
+
+                            // Sprawdzenie, czy pola są wypełnione
+                            if (TextUtils.isEmpty(systolicString) || TextUtils.isEmpty(diastolicString) || TextUtils.isEmpty(heartRateString)) {
+                                Toast.makeText(MainActivity.this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            // Konwersja wartości na liczby całkowite
+                            int systolic = Integer.parseInt(systolicString);
+                            int diastolic = Integer.parseInt(diastolicString);
+                            int heartRate = Integer.parseInt(heartRateString);
+
+                            // Utworzenie obiektu Preasure i ustawienie wartości
+                            Pressure pressure = new Pressure();
+                            pressure.setSystolic(systolic);
+                            pressure.setDiastolic(diastolic);
+                            pressure.setHeartrate(heartRate);
+                            pressure.setNote(note);
+                            pressure.setDate(currentDate);
+                            pressure.setTime(currentTime);
+
+                            // Dodanie pomiaru do bazy danych Firebase Realtime Database pod użytkownikiem
+                            DatabaseReference userPressureRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Pressures").push();
+                            userPressureRef.setValue(pressure)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Wyświetlenie komunikatu potwierdzającego dodanie pomiaru
+                                            Toast.makeText(MainActivity.this, "Dodano pomiar ciśnienia", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Wyświetlenie komunikatu o błędzie
+                                            Toast.makeText(MainActivity.this, "Błąd podczas dodawania pomiaru: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                            // Zamknięcie dialogu
+                            dialog.dismiss();
+                        }
+                    });
+
+                    Button btnCancelAddPressure = dialogView.findViewById(R.id.btnCancelAddPressure);
+                    btnCancelAddPressure.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Zamknięcie dialogu
+                            dialog.dismiss();
+                        }
+                    });
+
+                    // Ustawienie tła dialogu na przezroczyste
+                    if (dialog.getWindow() != null) {
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    }
+
+                    // Wyświetlenie dialogu
+                    dialog.show();
                 }
-
-                // Tworzenie okna dialogowego
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_pressure, null);
-                EditText systolicEditText = dialogView.findViewById(R.id.systolicEditText);
-                EditText diastolicEditText = dialogView.findViewById(R.id.diastolicEditText);
-                EditText heartRateEditText = dialogView.findViewById(R.id.pulseEditText);
-                EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
-                Button btnSave = dialogView.findViewById(R.id.btnAddPressure);
-
-                // Ustawienie bieżącej daty i godziny
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                String currentDate = dateFormat.format(calendar.getTime());
-                String currentTime = timeFormat.format(calendar.getTime());
-
-                builder.setView(dialogView);
-                AlertDialog dialog = builder.create();
-
-                // Obsługa przycisków do zmniejszania i zwiększania wartości ciśnienia oraz tętna
-                ImageButton btnSystolicMinus = dialogView.findViewById(R.id.btnSystolicMinus);
-                ImageButton btnSystolicPlus = dialogView.findViewById(R.id.btnSystolicPlus);
-                ImageButton btnDiastolicMinus = dialogView.findViewById(R.id.btnDiastolicMinus);
-                ImageButton btnDiastolicPlus = dialogView.findViewById(R.id.btnDiastolicPlus);
-                ImageButton btnPulseMinus = dialogView.findViewById(R.id.btnPulseMinus);
-                ImageButton btnPulsePlus = dialogView.findViewById(R.id.btnPulsePlus);
-
-                // Obsługa przycisku btnSystolicMinus
-                btnSystolicMinus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
-                        if (currentSystolic > 0) {
-                            systolicEditText.setText(String.valueOf(currentSystolic - 1));
-                        }
-                    }
-                });
-
-                // Obsługa przycisku btnSystolicPlus
-                btnSystolicPlus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentSystolic = Integer.parseInt(systolicEditText.getText().toString());
-                        systolicEditText.setText(String.valueOf(currentSystolic + 1));
-                    }
-                });
-
-                // Obsługa przycisku btnDiastolicMinus
-                btnDiastolicMinus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
-                        if (currentDiastolic > 0) {
-                            diastolicEditText.setText(String.valueOf(currentDiastolic - 1));
-                        }
-                    }
-                });
-
-                // Obsługa przycisku btnDiastolicPlus
-                btnDiastolicPlus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentDiastolic = Integer.parseInt(diastolicEditText.getText().toString());
-                        diastolicEditText.setText(String.valueOf(currentDiastolic + 1));
-                    }
-                });
-
-                // Obsługa przycisku btnPulseMinus
-                btnPulseMinus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
-                        if (currentPulse > 0) {
-                            heartRateEditText.setText(String.valueOf(currentPulse - 1));
-                        }
-                    }
-                });
-
-                // Obsługa przycisku btnPulsePlus
-                btnPulsePlus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int currentPulse = Integer.parseInt(heartRateEditText.getText().toString());
-                        heartRateEditText.setText(String.valueOf(currentPulse + 1));
-                    }
-                });
-
-                // Obsługa przycisku btnSave
-                btnSave.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Pobranie danych z pól tekstowych
-                        String systolicString = systolicEditText.getText().toString();
-                        String diastolicString = diastolicEditText.getText().toString();
-                        String heartRateString = heartRateEditText.getText().toString();
-                        String note = noteEditText.getText().toString();
-
-                        // Sprawdzenie, czy pola są wypełnione
-                        if (TextUtils.isEmpty(systolicString) || TextUtils.isEmpty(diastolicString) || TextUtils.isEmpty(heartRateString)) {
-                            Toast.makeText(MainActivity.this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        // Konwersja wartości na liczby całkowite
-                        int systolic = Integer.parseInt(systolicString);
-                        int diastolic = Integer.parseInt(diastolicString);
-                        int heartRate = Integer.parseInt(heartRateString);
-
-                        // Utworzenie obiektu Preasure i ustawienie wartości
-                        Pressure pressure = new Pressure();
-                        pressure.setSystolic(systolic);
-                        pressure.setDiastolic(diastolic);
-                        pressure.setHeartrate(heartRate);
-                        pressure.setNote(note);
-                        pressure.setDate(currentDate);
-                        pressure.setTime(currentTime);
-
-                        // Dodanie pomiaru do bazy danych Firebase Realtime Database pod użytkownikiem
-                        DatabaseReference userPressureRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Pressures").push();
-                        userPressureRef.setValue(pressure)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        // Wyświetlenie komunikatu potwierdzającego dodanie pomiaru
-                                        Toast.makeText(MainActivity.this, "Dodano pomiar ciśnienia", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        // Wyświetlenie komunikatu o błędzie
-                                        Toast.makeText(MainActivity.this, "Błąd podczas dodawania pomiaru: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                        // Zamknięcie dialogu
-                        dialog.dismiss();
-                    }
-                });
-
-                Button btnCancelAddPressure = dialogView.findViewById(R.id.btnCancelAddPressure);
-                btnCancelAddPressure.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Zamknięcie dialogu
-                        dialog.dismiss();
-                    }
-                });
-
-                // Ustawienie tła dialogu na przezroczyste
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                }
-
-                // Wyświetlenie dialogu
-                dialog.show();
-            }
         });
         // Dodawanie leku
         addMedicine.setOnClickListener(new View.OnClickListener() {
