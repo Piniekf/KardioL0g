@@ -110,7 +110,7 @@ public class FilesFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Obsługa błędów
+
                 }
             });
 
@@ -122,7 +122,7 @@ public class FilesFragment extends Fragment {
             storageRef.delete().addOnSuccessListener(aVoid -> {
                 // Plik usunięty pomyślnie z Storage
             }).addOnFailureListener(exception -> {
-                // Obsłuż błędy
+
             });
         }
     }

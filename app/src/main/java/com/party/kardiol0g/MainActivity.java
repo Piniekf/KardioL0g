@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             selectedFileUri = data.getData();
-            // Tutaj możesz wykonać dodatkowe operacje związane z wybranym plikiem, jeśli są wymagane
         }
     }
 
@@ -120,8 +119,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
                         mInterstitialAd = interstitialAd;
                         Log.i(TAG, "onAdLoaded");
                     }
@@ -142,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        // Obsługa reklamy
+
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
@@ -154,15 +151,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
                         mInterstitialAd = interstitialAd;
                         Log.i(TAG, "onAdLoaded");
                     }
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
                         Log.d(TAG, loadAdError.toString());
                         mInterstitialAd = null;
                     }
@@ -212,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Obsługa błędu pobierania danych
                 }
             });
         }

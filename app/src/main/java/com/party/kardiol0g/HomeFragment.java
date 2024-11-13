@@ -153,7 +153,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Obsługa błędu
+
             }
         });
     }
@@ -217,7 +217,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // Metoda do formatowania daty do postaci "MM-dd" lub "dd.MM"
+    // Metoda do formatowania daty
     private String formatToMonthDay(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());

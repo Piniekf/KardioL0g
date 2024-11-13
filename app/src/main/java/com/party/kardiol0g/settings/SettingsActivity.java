@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button buttonSave, buttonBack;
     private Spinner doctorSpinner;
     private ArrayAdapter<String> doctorAdapter;
-    private Map<String, String> doctorMap = new HashMap<>(); // Initialize doctorMap to avoid NullPointerException
+    private Map<String, String> doctorMap = new HashMap<>();
     private DatabaseReference userDatabase;
 
     @Override
@@ -101,14 +101,14 @@ public class SettingsActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Obsługa błędu
+
                     }
                 });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Obsługa błędu
+
             }
         });
 

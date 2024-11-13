@@ -53,7 +53,6 @@ public class HomeFragment_Doctor extends Fragment {
             }
         });
 
-        // Dodaj przycisk do layoutu
         RelativeLayout layout = view.findViewById(R.id.relativeLayout);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,

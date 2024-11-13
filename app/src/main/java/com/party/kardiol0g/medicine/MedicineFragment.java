@@ -37,7 +37,7 @@ public class MedicineFragment extends Fragment {
     private ArrayAdapter<Medicine> adapter;
 
     public MedicineFragment() {
-        // Required empty public constructor
+
     }
 
     public static MedicineFragment newInstance() {
@@ -154,7 +154,7 @@ public class MedicineFragment extends Fragment {
         // Ustawienie wartości pól edycji na podstawie danych leku
         medicineNameBox.setText(medicine.getName());
         medicineNameBox.setEnabled(false); // Ustawienie pola nazwy leku jako nieedytowalne
-        doseSpinner.getSelectedItem(); // to jest do poprawny, na razie tak zostawiam bo nie wiem jak to zrobić
+        doseSpinner.getSelectedItem();
         quantityEditText.setText(medicine.getQuantity());
         morningCheckBox.setChecked(medicine.isMorning());
         noonCheckBox.setChecked(medicine.isNoon());
