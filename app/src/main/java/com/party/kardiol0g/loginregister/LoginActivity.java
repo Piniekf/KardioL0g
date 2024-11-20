@@ -30,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.party.kardiol0g.MainActivity;
 import com.party.kardiol0g.MainActivity_Doctor;
 import com.party.kardiol0g.R;
+import com.party.kardiol0g.settings.InitialSettingsActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -158,21 +159,39 @@ public class LoginActivity extends AppCompatActivity {
         String userId = auth.getCurrentUser().getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
 
-        userRef.child("czyLekarz").get().addOnCompleteListener(task -> {
+        userRef.child("isInitialSettingsPassed").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Boolean isDoctor = task.getResult().getValue(Boolean.class);
-                if (isDoctor != null && isDoctor) {
-                    // Jeśli użytkownik jest lekarzem, przejdź do MainActivity_Doctor
-                    startActivity(new Intent(LoginActivity.this, MainActivity_Doctor.class));
-                } else {
-                    // Jeśli użytkownik nie jest lekarzem, przejdź do MainActivity
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                Boolean isInitialSettingsPassed = task.getResult().getValue(Boolean.class);
+
+                // Jeśli ustawienie "isInitialSettingsPassed" nie jest true, przekieruj do InitialSettingsActivity
+                if (isInitialSettingsPassed == null || !isInitialSettingsPassed) {
+                    startActivity(new Intent(LoginActivity.this, InitialSettingsActivity.class));
+                    finish(); // Zakończ LoginActivity
+                    return;
                 }
-                finish(); // Zakończ LoginActivity
+
+                // Sprawdź, czy użytkownik jest lekarzem
+                userRef.child("czyLekarz").get().addOnCompleteListener(task2 -> {
+                    if (task2.isSuccessful()) {
+                        Boolean isDoctor = task2.getResult().getValue(Boolean.class);
+                        if (isDoctor != null && isDoctor) {
+                            // Jeśli użytkownik jest lekarzem, przejdź do MainActivity_Doctor
+                            startActivity(new Intent(LoginActivity.this, MainActivity_Doctor.class));
+                        } else {
+                            // Jeśli użytkownik nie jest lekarzem, przejdź do MainActivity
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        }
+                        finish(); // Zakończ LoginActivity
+                    } else {
+                        // Obsłuż błąd odczytu z bazy danych dla "czyLekarz"
+                        Toast.makeText(LoginActivity.this, "Nie udało się pobrać danych użytkownika", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
-                // Obsłuż błąd odczytu z bazy danych
+                // Obsłuż błąd odczytu z bazy danych dla "isInitialSettingsPassed"
                 Toast.makeText(LoginActivity.this, "Nie udało się pobrać danych użytkownika", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 }

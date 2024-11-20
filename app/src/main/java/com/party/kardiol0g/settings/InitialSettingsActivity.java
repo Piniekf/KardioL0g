@@ -246,7 +246,7 @@ public class InitialSettingsActivity extends AppCompatActivity {
             String selectedDoctorUid = doctorMap.get(selectedDoctorName);
             userDatabase.child("lekarzProwadzacyUid").setValue(selectedDoctorUid);
         }
-
+        userDatabase.child("isInitialSettingsPassed").setValue(true);
         Toast.makeText(this, "Dane zapisane", Toast.LENGTH_SHORT).show();
 
         startActivity(new Intent(InitialSettingsActivity.this, MainActivity.class));

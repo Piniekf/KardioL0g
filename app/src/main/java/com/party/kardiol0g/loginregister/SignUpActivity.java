@@ -1,8 +1,5 @@
 package com.party.kardiol0g.loginregister;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +7,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -62,7 +62,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 currentUserDb.child("nazwisko").setValue("");
                                 currentUserDb.child("dataUrodzenia").setValue("");
                                 currentUserDb.child("czyLekarz").setValue(false); // Domyślnie ustawione na false, może być zmienione w InitialSettingsActivity
-
+                                currentUserDb.child("isInitialSettingsPassed").setValue(false);
                                 Toast.makeText(SignUpActivity.this, "Rejestracja pomyślna!", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(SignUpActivity.this, InitialSettingsActivity.class));
                             } else {
