@@ -47,7 +47,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -112,32 +111,10 @@ public class MainActivity_Doctor extends AppCompatActivity implements Navigation
             // Tutaj możesz wykonać dodatkowe operacje związane z wybranym plikiem, jeśli są wymagane
         }
     }
-
-    private void loadInterstitialAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-
-        InterstitialAd.load(this,"ca-app-pub-3940256099942544/1033173712", adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAd = interstitialAd;
-                        Log.i(TAG, "onAdLoaded");
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        Log.d(TAG, loadAdError.toString());
-                        mInterstitialAd = null;
-                    }
-                });
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_doctor);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
@@ -179,7 +156,6 @@ public class MainActivity_Doctor extends AppCompatActivity implements Navigation
         toggle.syncState();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        fab = findViewById(R.id.fab);
 
         // Odczytanie preferencji motywu
         nightMode = sharedPreferences.getBoolean("nightMode", false);
@@ -243,24 +219,6 @@ public class MainActivity_Doctor extends AppCompatActivity implements Navigation
                     break;
             }
             return true;
-        });
-        // Obsługa guzika plus
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mInterstitialAd != null) {
-                    mInterstitialAd.show(MainActivity_Doctor.this);
-                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            loadInterstitialAd(); // Ponowne ładowanie reklamy po jej zamknięciu
-                        }
-                    });
-                } else {
-                    Log.d("TAG", "Reklama nie jest gotowa.");
-                }
-                showBottomDialog();
-            }
         });
     }
 
