@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -69,22 +70,45 @@ public class InitialSettingsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<String> doctorNames = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String doctorName = snapshot.child("imie").getValue(String.class) + " " + snapshot.child("nazwisko").getValue(String.class);
-                    String doctorUid = snapshot.getKey(); // Pobierz UID lekarza
-                    doctorMap.put(doctorName, doctorUid); // Dodaj parę imię + nazwisko -> UID do mapy
-                    doctorNames.add(doctorName);
+                doctorMap.clear(); // Upewnij się, że mapa jest pusta przed dodaniem nowych wartości
+
+
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String firstName = snapshot.child("imie").getValue(String.class);
+                        String lastName = snapshot.child("nazwisko").getValue(String.class);
+                        String doctorUid = snapshot.getKey();
+                        Log.d("DoctorSpinner", "Dane snapshot: " + dataSnapshot.toString());
+                        Log.d("DoctorSpinner", "Mapa lekarzy: " + doctorMap.toString());
+
+                        if (firstName != null && lastName != null && doctorUid != null) {
+                            String doctorName = firstName + " " + lastName;
+                            doctorMap.put(doctorName, doctorUid);
+                            doctorNames.add(doctorName);
+                        } else {
+                            Log.e("DoctorSpinner", "Błąd danych lekarza: " + snapshot.getKey());
+                        }
+                    }
+                } else {
+                    Log.w("DoctorSpinner", "Nie znaleziono lekarzy w bazie.");
                 }
-                doctorAdapter = new ArrayAdapter<>(InitialSettingsActivity.this, android.R.layout.simple_spinner_item, doctorNames);
-                doctorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                doctorSpinner.setAdapter(doctorAdapter);
+
+                // Ustawienie adaptera
+                if (!doctorNames.isEmpty()) {
+                    doctorAdapter = new ArrayAdapter<>(InitialSettingsActivity.this, android.R.layout.simple_spinner_item, doctorNames);
+                    doctorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    doctorSpinner.setAdapter(doctorAdapter);
+                } else {
+                    Toast.makeText(InitialSettingsActivity.this, "Brak lekarzy do wyświetlenia", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Obsługa błędu
+                Log.e("DoctorSpinner", "Błąd Firebase: " + databaseError.getMessage());
             }
         });
+
 
         editTextDateOfBirth.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -332,7 +332,6 @@ public class MainActivity_Doctor extends AppCompatActivity implements Navigation
         LinearLayout addPressure = dialog[0].findViewById(R.id.addPreasure);
         LinearLayout addMedicine = dialog[0].findViewById(R.id.addMedicine);
         LinearLayout addFile = dialog[0].findViewById(R.id.addFile);
-        LinearLayout doctorChat = dialog[0].findViewById(R.id.doctorChat);
         ImageView cancelButton = dialog[0].findViewById(R.id.cancelButton);
         // Dodawanie ciśnienia
         addPressure.setOnClickListener(new View.OnClickListener() {
@@ -836,15 +835,6 @@ public class MainActivity_Doctor extends AppCompatActivity implements Navigation
             }
         });
 
-        // Czat z lekarzem, ale to nie wiem czy zdążę zrobić
-        doctorChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog[0].dismiss();
-                Toast.makeText(MainActivity_Doctor.this,"Czat z lekarzem kliknięte",Toast.LENGTH_SHORT).show();
-
-            }
-        });
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override

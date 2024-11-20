@@ -110,30 +110,4 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/doctorChat"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="30dp">
-
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_message_24"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Napisz do lekarza"
-            android:textColor="@color/appred"
-            android:layout_marginLeft="30dp"
-            android:textSize="14sp"/>
-
-    </LinearLayout>
-
 </LinearLayout>

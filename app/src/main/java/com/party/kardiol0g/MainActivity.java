@@ -325,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LinearLayout addPressure = dialog[0].findViewById(R.id.addPreasure);
         LinearLayout addMedicine = dialog[0].findViewById(R.id.addMedicine);
         LinearLayout addFile = dialog[0].findViewById(R.id.addFile);
-        LinearLayout doctorChat = dialog[0].findViewById(R.id.doctorChat);
         ImageView cancelButton = dialog[0].findViewById(R.id.cancelButton);
         // Dodawanie ciśnienia
         addPressure.setOnClickListener(new View.OnClickListener() {
@@ -826,16 +825,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     fileDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 }
                 fileDialog.show();
-            }
-        });
-
-        // Czat z lekarzem, ale to nie wiem czy zdążę zrobić
-        doctorChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog[0].dismiss();
-                Toast.makeText(MainActivity.this,"Czat z lekarzem kliknięte",Toast.LENGTH_SHORT).show();
-
             }
         });
 
