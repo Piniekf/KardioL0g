@@ -12,17 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.developer.gbuttons.GoogleSignInButton;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -38,9 +30,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signupRedirectText, forgotPassword;
     private Button loginButton;
     private FirebaseAuth auth;
-    private GoogleSignInButton googleBtn;
-    private GoogleSignInOptions gOptions;
-    private GoogleSignInClient gClient;
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
@@ -53,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.signUpRedirectText);
         forgotPassword = findViewById(R.id.forgot_password);
-        googleBtn = findViewById(R.id.googleBtn);
 
         auth = FirebaseAuth.getInstance();
 
@@ -115,30 +103,6 @@ public class LoginActivity extends AppCompatActivity {
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             }
             dialog.show();
-        });
-
-        // Konfiguracja logowania przez Google
-        gOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gClient = GoogleSignIn.getClient(this, gOptions);
-
-        // Rejestracja ActivityResultLauncher dla logowania przez Google
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                Intent data = result.getData();
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                try {
-                    task.getResult(ApiException.class);
-                    navigateToAppropriateActivity();
-                } catch (ApiException e) {
-                    Toast.makeText(LoginActivity.this, "Coś poszło nie tak", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // Obsługa kliknięcia przycisku logowania przez Google
-        googleBtn.setOnClickListener(view -> {
-            Intent signInIntent = gClient.getSignInIntent();
-            activityResultLauncher.launch(signInIntent);
         });
     }
 
