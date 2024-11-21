@@ -62,7 +62,8 @@ public class PatientDetailsActivity extends AppCompatActivity {
                 for (DataSnapshot medicineSnapshot : dataSnapshot.child("Medicines").getChildren()) {
                     String medicine = getStringValue(medicineSnapshot.child("name")) + " " +
                             getStringValue(medicineSnapshot.child("strength")) + ", " +
-                            getStringValue(medicineSnapshot.child("dose")) + "\n";
+                            getStringValue(medicineSnapshot.child("dose")) + ", " +
+                            getStringValue(medicineSnapshot.child("note")) + "\n";
                     details.append(medicine);
                 }
 
@@ -70,7 +71,8 @@ public class PatientDetailsActivity extends AppCompatActivity {
                 for (DataSnapshot pressureSnapshot : dataSnapshot.child("Pressures").getChildren()) {
                     String pressure = "Data: " + getStringValue(pressureSnapshot.child("date")) + ", " +
                             "Skurczowe: " + getStringValue(pressureSnapshot.child("systolic")) + ", " +
-                            "Rozkurczowe: " + getStringValue(pressureSnapshot.child("diastolic")) + "\n";
+                            "Rozkurczowe: " + getStringValue(pressureSnapshot.child("diastolic")) + ", " +
+                            "Notatka: " + getStringValue(pressureSnapshot.child("note")) + "\n";
                     details.append(pressure);
                 }
 
