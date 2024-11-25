@@ -92,7 +92,7 @@
             android:id="@+id/editTextContactPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Numer telefonu kontaktowej osoby" />
+            android:hint="Numer telefonu osoby kontaktowej" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
