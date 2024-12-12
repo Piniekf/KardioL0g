@@ -56,12 +56,11 @@ public class SignUpActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 String userId = auth.getCurrentUser().getUid();
                                 DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
-                                // Więcej danych jak będzie potrzebnych, póki co zostawiam tak
                                 currentUserDb.child("email").setValue(user);
                                 currentUserDb.child("imie").setValue("");
                                 currentUserDb.child("nazwisko").setValue("");
                                 currentUserDb.child("dataUrodzenia").setValue("");
-                                currentUserDb.child("czyLekarz").setValue(false); // Domyślnie ustawione na false, może być zmienione w InitialSettingsActivity
+                                currentUserDb.child("czyLekarz").setValue(false);
                                 currentUserDb.child("isInitialSettingsPassed").setValue(false);
                                 Toast.makeText(SignUpActivity.this, "Rejestracja pomyślna!", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(SignUpActivity.this, InitialSettingsActivity.class));

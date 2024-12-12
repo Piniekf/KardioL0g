@@ -71,8 +71,6 @@ public class InitialSettingsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<String> doctorNames = new ArrayList<>();
                 doctorMap.clear(); // Upewnij się, że mapa jest pusta przed dodaniem nowych wartości
-
-
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String firstName = snapshot.child("imie").getValue(String.class);
@@ -92,11 +90,11 @@ public class InitialSettingsActivity extends AppCompatActivity {
                 } else {
                     Log.w("DoctorSpinner", "Nie znaleziono lekarzy w bazie.");
                 }
-
                 // Ustawienie adaptera
                 if (!doctorNames.isEmpty()) {
                     doctorAdapter = new ArrayAdapter<>(InitialSettingsActivity.this, android.R.layout.simple_spinner_item, doctorNames);
-                    doctorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    doctorAdapter.setDropDownViewResource
+                            (android.R.layout.simple_spinner_dropdown_item);
                     doctorSpinner.setAdapter(doctorAdapter);
                 } else {
                     Toast.makeText(InitialSettingsActivity.this, "Brak lekarzy do wyświetlenia", Toast.LENGTH_SHORT).show();
@@ -183,7 +181,6 @@ public class InitialSettingsActivity extends AppCompatActivity {
         RadioButton selectedGenderRadioButton = findViewById(selectedGenderId);
         String gender = selectedGenderRadioButton.getText().toString();
         if (role.equals("Pacjent")) {
-            // Sprawdzaj walidacje tylko dla pacjentów
             if (!isValidDate(dateOfBirth)) {
                 Toast.makeText(this, "Niepoprawny format daty urodzenia. Wymagany format: DD/MM/RRRR", Toast.LENGTH_SHORT).show();
                 return;
@@ -229,7 +226,6 @@ public class InitialSettingsActivity extends AppCompatActivity {
         userDatabase.child("nazwisko").setValue(lastName);
         userDatabase.child("czyLekarz").setValue(role.equals("Lekarz"));
         userDatabase.child("płeć").setValue(gender);
-
         if (role.equals("Pacjent")) {
             if (TextUtils.isEmpty(dateOfBirth) || height == 0 || weight == 0) {
                 Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
@@ -240,8 +236,6 @@ public class InitialSettingsActivity extends AppCompatActivity {
             userDatabase.child("waga").setValue(weight);
             userDatabase.child("osobaKontaktowa").setValue(contactPerson);
             userDatabase.child("numerTelefonuKontaktowej").setValue(contactPhoneNumber);
-
-            // Zapisz UID wybranego lekarza
             String selectedDoctorName = doctorSpinner.getSelectedItem().toString();
             String selectedDoctorUid = doctorMap.get(selectedDoctorName);
             userDatabase.child("lekarzProwadzacyUid").setValue(selectedDoctorUid);

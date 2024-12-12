@@ -145,14 +145,12 @@ public class LoginActivity extends AppCompatActivity {
                             // Jeśli użytkownik nie jest lekarzem, przejdź do MainActivity
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
-                        finish(); // Zakończ LoginActivity
+                        finish();
                     } else {
-                        // Obsłuż błąd odczytu z bazy danych dla "czyLekarz"
                         Toast.makeText(LoginActivity.this, "Nie udało się pobrać danych użytkownika", Toast.LENGTH_SHORT).show();
                     }
                 });
             } else {
-                // Obsłuż błąd odczytu z bazy danych dla "isInitialSettingsPassed"
                 Toast.makeText(LoginActivity.this, "Nie udało się pobrać danych użytkownika", Toast.LENGTH_SHORT).show();
             }
         });
