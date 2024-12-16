@@ -299,17 +299,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addPressure.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    dialog[0].dismiss(); // Zamknięcie istniejącego dialogu, jeśli istnieje
-
-                    // Pobranie bieżącego użytkownika
+                    dialog[0].dismiss();
                     FirebaseUser currentUser = mAuth.getCurrentUser();
                     if (currentUser == null) {
-                        // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat
                         Toast.makeText(MainActivity.this, "Nie można dodać pomiaru. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-                    // Tworzenie okna dialogowego
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_pressure, null);
                     EditText systolicEditText = dialogView.findViewById(R.id.systolicEditText);
@@ -317,26 +312,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     EditText heartRateEditText = dialogView.findViewById(R.id.pulseEditText);
                     EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
                     Button btnSave = dialogView.findViewById(R.id.btnAddPressure);
-
-                    // Ustawienie bieżącej daty i godziny
                     Calendar calendar = Calendar.getInstance();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                     String currentDate = dateFormat.format(calendar.getTime());
                     String currentTime = timeFormat.format(calendar.getTime());
-
                     builder.setView(dialogView);
                     AlertDialog dialog = builder.create();
-
-                    // Obsługa przycisków do zmniejszania i zwiększania wartości ciśnienia oraz tętna
                     ImageButton btnSystolicMinus = dialogView.findViewById(R.id.btnSystolicMinus);
                     ImageButton btnSystolicPlus = dialogView.findViewById(R.id.btnSystolicPlus);
                     ImageButton btnDiastolicMinus = dialogView.findViewById(R.id.btnDiastolicMinus);
                     ImageButton btnDiastolicPlus = dialogView.findViewById(R.id.btnDiastolicPlus);
                     ImageButton btnPulseMinus = dialogView.findViewById(R.id.btnPulseMinus);
                     ImageButton btnPulsePlus = dialogView.findViewById(R.id.btnPulsePlus);
-
-                    // Obsługa przycisku btnSystolicMinus
                     btnSystolicMinus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -346,8 +334,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         }
                     });
-
-                    // Obsługa przycisku btnSystolicPlus
                     btnSystolicPlus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -355,8 +341,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             systolicEditText.setText(String.valueOf(currentSystolic + 1));
                         }
                     });
-
-                    // Obsługa przycisku btnDiastolicMinus
                     btnDiastolicMinus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -366,8 +350,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         }
                     });
-
-                    // Obsługa przycisku btnDiastolicPlus
                     btnDiastolicPlus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -375,8 +357,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             diastolicEditText.setText(String.valueOf(currentDiastolic + 1));
                         }
                     });
-
-                    // Obsługa przycisku btnPulseMinus
                     btnPulseMinus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -386,8 +366,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         }
                     });
-
-                    // Obsługa przycisku btnPulsePlus
                     btnPulsePlus.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -395,29 +373,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             heartRateEditText.setText(String.valueOf(currentPulse + 1));
                         }
                     });
-
-                    // Obsługa przycisku btnSave
                     btnSave.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // Pobranie danych z pól tekstowych
                             String systolicString = systolicEditText.getText().toString();
                             String diastolicString = diastolicEditText.getText().toString();
                             String heartRateString = heartRateEditText.getText().toString();
                             String note = noteEditText.getText().toString();
-
-                            // Sprawdzenie, czy pola są wypełnione
                             if (TextUtils.isEmpty(systolicString) || TextUtils.isEmpty(diastolicString) || TextUtils.isEmpty(heartRateString)) {
                                 Toast.makeText(MainActivity.this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show();
                                 return;
                             }
-
-                            // Konwersja wartości na liczby całkowite
                             int systolic = Integer.parseInt(systolicString);
                             int diastolic = Integer.parseInt(diastolicString);
                             int heartRate = Integer.parseInt(heartRateString);
-
-                            // Utworzenie obiektu Preasure i ustawienie wartości
                             Pressure pressure = new Pressure();
                             pressure.setSystolic(systolic);
                             pressure.setDiastolic(diastolic);
@@ -425,8 +394,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             pressure.setNote(note);
                             pressure.setDate(currentDate);
                             pressure.setTime(currentTime);
-
-                            // Dodanie pomiaru do bazy danych Firebase Realtime Database pod użytkownikiem
                             DatabaseReference userPressureRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Pressures").push();
                             userPressureRef.setValue(pressure)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -443,8 +410,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             Toast.makeText(MainActivity.this, "Błąd podczas dodawania pomiaru: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
-                            // Zamknięcie dialogu
                             dialog.dismiss();
                         }
                     });
@@ -453,17 +418,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     btnCancelAddPressure.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // Zamknięcie dialogu
                             dialog.dismiss();
                         }
                     });
-
-                    // Ustawienie tła dialogu na przezroczyste
                     if (dialog.getWindow() != null) {
                         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     }
-
-                    // Wyświetlenie dialogu
                     dialog.show();
                 }
         });
@@ -482,19 +442,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 CheckBox noonCheckBox = dialogView.findViewById(R.id.noonCheckBox);
                 CheckBox eveningCheckBox = dialogView.findViewById(R.id.eveningCheckBox);
                 EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
-
-
-                // Deklaracja listy medicineNames
                 List<String> medicineNames = new ArrayList<>();
-
-                // Pobierz listę leków z Firestore i ustaw ją jako źródło podpowiedzi dla AutoCompleteTextView
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 CollectionReference medicinesRef = db.collection("medicines");
-
-                // Ustawienie wszystkich elementów jako nieaktywne początkowo
                 medicineNameBox.setEnabled(false);
                 btnAddMedicine.setEnabled(false);
-
                 medicinesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -503,14 +455,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 String medicineName = document.getString("Nazwa Produktu Leczniczego");
                                 String medicineStrength = document.getString("Moc");
                                 if (medicineName != null && medicineStrength != null) {
-                                    medicineNames.add(medicineName + " - " + medicineStrength); // Dodaj zarówno nazwę, jak i moc do listy
+                                    medicineNames.add(medicineName + " - " + medicineStrength);
                                 }
                             }
-
                             ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, medicineNames);
                             medicineNameBox.setAdapter(adapter);
-
-                            // Po zakończeniu wczytywania danych, ustaw elementy jako aktywne
                             medicineNameBox.setEnabled(true);
                             progressBar.setVisibility(View.GONE);
                         } else {
@@ -518,37 +467,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 });
-
-                // Pokaż progressBar na początku wczytywania danych
                 progressBar.setVisibility(View.VISIBLE);
-
-                // Dodaj nasłuchiwacz na zmiany w polu AutoCompleteTextView
                 medicineNameBox.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        // Sprawdź, czy wpisany tekst pasuje do jednej z sugerowanych opcji
                         String enteredText = editable.toString();
                         if (medicineNames.contains(enteredText)) {
-                            // Włącz przycisk dodawania, jeśli wpisany tekst pasuje do jednej z sugerowanych opcji
                             btnAddMedicine.setEnabled(true);
-                            btnAddMedicine.setAlpha(1f); // Przywróć normalną widoczność przycisku
+                            btnAddMedicine.setAlpha(1f);
                         } else {
-                            // Wyłącz przycisk dodawania, jeśli wpisany tekst nie pasuje do żadnej z sugerowanych opcji
                             btnAddMedicine.setEnabled(false);
-                            btnAddMedicine.setAlpha(0.5f); // Wyszarz przycisk
+                            btnAddMedicine.setAlpha(0.5f);
                         }
                     }
                 });
-
                 builder.setView(dialogView);
                 androidx.appcompat.app.AlertDialog dialog = builder.create();
-
                 dialogView.findViewById(R.id.btnAddMedicine).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -557,37 +495,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Toast.makeText(MainActivity.this, "Wybierz lek", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
-                        // Rozdzielanie nazwy leku i mocy
                         String[] parts = medicineNameWithStrength.split(" - ");
                         String medicineName = parts[0];
                         String medicineStrength = parts[1];
-
-                        // Pobierz wartość dawki ze spinnera
                         String dose = doseSpinner.getSelectedItem().toString();
-
-                        // Pobierz ilość z EditText
                         String quantity = quantityEditText.getText().toString();
-
                         if (TextUtils.isEmpty(dose)) {
                             Toast.makeText(MainActivity.this, "Wprowadź dawkę", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
                         if (TextUtils.isEmpty(quantity)) {
                             Toast.makeText(MainActivity.this, "Wprowadź ilość", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
-                        // Sprawdź, czy pole wyboru jest zaznaczone
                         boolean isMorningChecked = morningCheckBox.isChecked();
                         boolean isNoonChecked = noonCheckBox.isChecked();
                         boolean isEveningChecked = eveningCheckBox.isChecked();
-
-                        // Pobierz notatkę z EditText
                         String note = noteEditText.getText().toString();
-
-                        // Tworzymy obiekt Medicine
                         Medicine medicine = new Medicine();
                         medicine.setName(medicineName);
                         medicine.setStrength(medicineStrength);
@@ -597,13 +521,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         medicine.setNoon(isNoonChecked);
                         medicine.setEvening(isEveningChecked);
                         medicine.setNote(note);
-
-                        // Sprawdź, czy wybrany lek już istnieje w bazie danych użytkownika
                         FirebaseUser currentUser = mAuth.getCurrentUser();
                         if (currentUser != null) {
                             DatabaseReference userMedicinesRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid()).child("Medicines");
-
-                            // Pobierz listę leków użytkownika z bazy danych
                             userMedicinesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -611,80 +531,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         Medicine existingMedicine = snapshot.getValue(Medicine.class);
                                         if (existingMedicine != null && existingMedicine.getName().equals(medicineName) && existingMedicine.getStrength().equals(medicineStrength)) {
-                                            // Jeśli lek już istnieje w bazie danych, ustaw flagę na true
                                             medicineExists = true;
                                             break;
                                         }
                                     }
                                     if (medicineExists) {
-                                        // Jeśli lek już istnieje, wyświetl odpowiedni komunikat
                                         Toast.makeText(MainActivity.this, "Lek już istnieje w bazie danych", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        // Jeśli lek nie istnieje, dodaj go do bazy danych
                                         String medicineId = userMedicinesRef.push().getKey();
                                         userMedicinesRef.child(medicineId).setValue(medicine)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        // Wyświetl komunikat potwierdzający dodanie leku
                                                         Toast.makeText(MainActivity.this, "Lek dodany pomyślnie", Toast.LENGTH_SHORT).show();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
-                                                        // Obsługa błędu dodawania leku
                                                         Toast.makeText(MainActivity.this, "Błąd podczas dodawania leku: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
                                     }
                                 }
-
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    // Obsługa błędu pobierania danych
                                     Toast.makeText(MainActivity.this, "Błąd pobierania danych: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
-                            // Jeśli użytkownik nie jest zalogowany, wyświetl komunikat o błędzie
                             Toast.makeText(MainActivity.this, "Nie można dodać leku. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
                         }
-
-                        // Zamknij dialog
                         dialog.dismiss();
                     }
                 });
-
-
                 dialogView.findViewById(R.id.btnCancelAddMedicine).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // Zamknij dialog
                         dialog.dismiss();
                     }
                 });
-
                 if (dialog.getWindow() != null){
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 }
                 dialog.show();
             }
         });
-        // Dodawanie pliku
         addFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog[0].dismiss();
-
-                // Pobranie bieżącego użytkownika
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if (currentUser == null) {
                     Toast.makeText(MainActivity.this, "Nie można dodać pliku. Użytkownik niezalogowany.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                // Tworzenie okna dialogowego
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_file, null);
                 EditText noteEditText = dialogView.findViewById(R.id.noteEditText);
@@ -692,14 +593,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Button btnSelectFile = dialogView.findViewById(R.id.btnSelectFile);
                 Button btnSaveFile = dialogView.findViewById(R.id.btnSaveFile);
                 Button btnSelectDate = dialogView.findViewById(R.id.btnSelectDate);
-
                 builder.setView(dialogView);
                 AlertDialog fileDialog = builder.create();
-
-                // Zmienna do przechowywania wybranej daty
                 final String[] selectedDate = {""};
-
-                // Obsługa wyboru daty
                 btnSelectDate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -718,8 +614,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         datePickerDialog.show();
                     }
                 });
-
-                // Obsługa przycisku wyboru pliku
                 btnSelectFile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -728,8 +622,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         startActivityForResult(Intent.createChooser(intent, "Wybierz plik PDF"), 1);
                     }
                 });
-
-                // Obsługa przycisku zapisu pliku
                 btnSaveFile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

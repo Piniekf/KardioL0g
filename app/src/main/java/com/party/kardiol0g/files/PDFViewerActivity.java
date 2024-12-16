@@ -44,12 +44,9 @@ public class PDFViewerActivity extends AppCompatActivity {
             parcelFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
             pdfRenderer = new PdfRenderer(parcelFileDescriptor);
             currentPage = pdfRenderer.openPage(0);
-
             Bitmap bitmap = Bitmap.createBitmap(currentPage.getWidth(), currentPage.getHeight(), Bitmap.Config.ARGB_8888);
             currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-
             pdfImageView.setImageBitmap(bitmap);
-
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Błąd podczas otwierania pliku PDF", Toast.LENGTH_SHORT).show();

@@ -104,7 +104,6 @@ public class MedicineFragment extends Fragment {
                     .child("Users")
                     .child(currentUser.getUid())
                     .child("Medicines");
-
             userMedicinesRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -112,16 +111,14 @@ public class MedicineFragment extends Fragment {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Medicine medicine = snapshot.getValue(Medicine.class);
                         if (medicine != null) {
-                            medicine.setId(snapshot.getKey()); // Ustawienie ID leku
+                            medicine.setId(snapshot.getKey());
                             medicineList.add(medicine);
                         }
                     }
                     adapter.notifyDataSetChanged();
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle database error
                 }
             });
         }
