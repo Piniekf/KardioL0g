@@ -94,7 +94,6 @@ public class PressureFragment extends Fragment {
                     .child("Users")
                     .child(currentUser.getUid())
                     .child("Pressures");
-
             pressureRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -108,7 +107,6 @@ public class PressureFragment extends Fragment {
                     }
                     preasureAdapter.notifyDataSetChanged();
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }

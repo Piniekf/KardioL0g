@@ -35,22 +35,14 @@ public class EmergencyButton extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-
         CharSequence widgetText = context.getString(R.string.appwidget_text);
-        // Utwórz obiekt RemoteViews
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.emergency_button);
         views.setTextViewText(R.id.appwidget_text, widgetText);
-
-        // Skonfiguruj intencję, która uruchomi EmergencyButtonService, który wykona akcję po kliknięciu przycisku
         Intent intent = new Intent(context, EmergencyButton.class);
         intent.setAction(ACTION_SEND_SMS);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_button, pendingIntent);
-
-        // Poinstruuj menedżera widżetów, aby zaktualizował widżet
         appWidgetManager.updateAppWidget(appWidgetId, views);
-
-        // Pobierz dane użytkownika
         fetchUserData(context, false);
     }
 
@@ -94,7 +86,6 @@ public class EmergencyButton extends AppWidgetProvider {
                     Log.w("EmergencyButton", "Dane użytkownika nie zostały znalezione w Firebase");
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("EmergencyButton", "Błąd podczas pobierania danych użytkownika z Firebase: " + databaseError.getMessage());
@@ -117,13 +108,10 @@ public class EmergencyButton extends AppWidgetProvider {
                     Log.d("EmergencyButton", "SMS wysłany na numer: " + contactPhoneNumber + " z linkiem do mapy: " + mapUrl);
                 }
             }
-
             @Override
             public void onStatusChanged(String provider, int status, android.os.Bundle extras) {}
-
             @Override
             public void onProviderEnabled(@NonNull String provider) {}
-
             @Override
             public void onProviderDisabled(@NonNull String provider) {}
         }, null);

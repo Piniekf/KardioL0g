@@ -64,14 +64,11 @@ public class FallDetectionService extends Service implements SensorEventListener
                     Log.w("FallDetectionService", "Numer telefonu kontaktowego nie został znaleziony w Firebase");
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("FallDetectionService", "Błąd podczas pobierania numeru telefonu z Firebase: " + databaseError.getMessage());
             }
         });
-
-        // Pokaż powiadomienie
         NotificationHelper.createNotificationChannel(this, "fall_detection_channel", "Fall Detection Service");
         NotificationHelper.showNotification(this, "fall_detection_channel", 1, "Czujnik upadku", "Czujnik wykrycia upadku jest włączony.");
     }
@@ -80,8 +77,6 @@ public class FallDetectionService extends Service implements SensorEventListener
     public void onDestroy() {
         super.onDestroy();
         sensorManager.unregisterListener(this);
-
-        // Ukryj powiadomienie
         NotificationHelper.cancelNotification(this, 1);
     }
 
@@ -91,18 +86,11 @@ public class FallDetectionService extends Service implements SensorEventListener
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
-
-        // Filtracja danych z akcelerometru
         x = lowPass(x, lastX);
         y = lowPass(y, lastY);
         z = lowPass(z, lastZ);
-
-        // Obliczenie przyspieszenia
         double acceleration = Math.sqrt(x * x + y * y + z * z);
-
-        // Sprawdzenie warunków wykrycia przewrócenia się
         if (isFallDetected(x, y, z, acceleration)) {
-            // Przewrócenie się zostało wykryte
             long currentTime = System.currentTimeMillis();
             if (!isFallDetected || (currentTime - lastFallTime) > TIME_THRESHOLD) {
                 isFallDetected = true;
@@ -110,11 +98,8 @@ public class FallDetectionService extends Service implements SensorEventListener
                 sendSMS();
             }
         } else {
-            // Brak przewrócenie się
             isFallDetected = false;
         }
-
-        // Zapisanie poprzednich danych
         lastX = x;
         lastY = y;
         lastZ = z;
@@ -129,44 +114,29 @@ public class FallDetectionService extends Service implements SensorEventListener
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    // Metoda filtrująca dolnoprzepustowa
     private float lowPass(float current, float last) {
         return last + ALPHA * (current - last);
     }
-
-    // Metoda sprawdzająca warunki wykrycia przewrócenia się
     private boolean isFallDetected(float x, float y, float z, double acceleration) {
-        // Warunek wykrycia upadku na podstawie przyspieszenia
         if (acceleration < FALL_THRESHOLD) {
-            // Sprawdzenie zmiany kierunku ruchu
             float angle = calculateAngle(x, y, z);
-            // Sprawdzenie zmiany prędkości ruchu
             float speed = calculateSpeed(x, y, z);
             return angle > ANGLE_THRESHOLD && speed > SPEED_THRESHOLD;
         }
         return false;
     }
-
-    // Metoda obliczająca kąt zmiany kierunku ruchu
     private float calculateAngle(float x, float y, float z) {
         float angle = (float) Math.toDegrees(Math.atan2(x, Math.sqrt(y * y + z * z)));
         return Math.abs(angle);
     }
-
-    // Metoda obliczająca prędkość ruchu
     private float calculateSpeed(float x, float y, float z) {
-        // Obliczenie zmiany prędkości na podstawie danych z akcelerometru
         float speed = Math.abs((x + y + z) - (lastX + lastY + lastZ));
         lastSpeed = speed;
         return speed;
     }
 
-    // Metoda wysyłająca SMS
     private void sendSMS() {
-        // Sprawdź, czy numer telefonu został pobrany
         if (contactPhoneNumber != null) {
-            // Pobierz aktualną lokalizację
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
@@ -175,15 +145,12 @@ public class FallDetectionService extends Service implements SensorEventListener
                 @Override
                 public void onLocationChanged(Location location) {
                     if (location != null) {
-                        // Utwórz adres URL do mapy
                         String mapUrl = "https://www.google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
-                        // Wyślij SMS
                         SmsManager smsManager = SmsManager.getDefault();
                         smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty! Lokalizacja: " + mapUrl, null, null);
                         Log.d("FallDetectionService", "SMS wysłany na numer: " + contactPhoneNumber + " z linkiem do mapy: " + mapUrl);
                     } else {
                         Log.w("FallDetectionService", "Nie udało się pobrać aktualnej lokalizacji");
-                        // Wyślij SMS bez lokalizacji, jeśli nie udało się jej pobrać
                         SmsManager smsManager = SmsManager.getDefault();
                         smsManager.sendTextMessage(contactPhoneNumber, null, "Upadek wykryty!", null, null);
                     }
